@@ -9,13 +9,13 @@ import numpy as np
 import pandas as pd
 
 
-def load_data(cwd):
+def load_data(file_path):
     """ Load and prepare data
 
     Parameters
     ----------
-    cwd : str
-        Project working directory
+    file_path : str
+        Path to file with input data
 
     Returns
     -------
@@ -24,7 +24,6 @@ def load_data(cwd):
     """
 
     # Read data
-    file_path = os.path.join(cwd, 'data', 'QZExport99-Pivot.xlsx')
     df = pd.read_excel(file_path, skiprows=[0,1,2,3], engine='openpyxl')
 
     # Columns
@@ -106,7 +105,8 @@ if __name__ == '__main__':
     cwd = os.getcwd()
 
     # Load and prepare data
-    df = load_data(cwd)
+    file_path = os.path.join(cwd, 'data', 'QZExport99-Pivot.xlsx')
+    df = load_data(file_path)
     df = df[~df['changed_police_based_reconciliation'].isnull()]
     df.to_csv('data/med_recon.csv', encoding='utf-8', index=False)
 
