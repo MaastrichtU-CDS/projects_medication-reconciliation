@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Process medication reconciliation data
+Medication reconciliation project
 """
 
 import os
@@ -97,6 +97,19 @@ def load_data(cwd):
             df[new_col] = df[col].apply(lambda x: 1 if str(i) in str(x) else 0)
         df.drop(columns=[col], inplace=True)
 
+    # Get dummy variables for other categorical columns
+    dummy_cols = ['gender', 'hospitalization', 'presence_risky_substance',
+                  'housing_type', 'using_medication',
+                  'pharmacy_package_availability', 'medication_giver',
+                  'education_level', 'alergies', 'visit_other_hospital',
+                  'hospitalization_not_mumc', 'health_assessement',
+                  'medication_prescription', 'prescribed_new_medication',
+                  'stop_medication', 'no_drug_intervention', 'evs_conflict',
+                  'medication_interactions', 'g_standard_code1',
+                  'wfg_evaluation1', 'g_standard_code2', 'wfg_evaluation2',
+                  'g_standard_code3', 'wfg_evaluation3']
+    df = pd.get_dummies(df, columns=dummy_cols)
+
     return df
 
 
@@ -107,3 +120,7 @@ if __name__ == '__main__':
 
     # Load and prepare data
     df = load_data(cwd)
+    df = df[~df['changed_police_based_reconciliation'].isnull()]
+    df.to_csv('data/med_recon.csv', encoding='utf-8', index=False)
+
+
