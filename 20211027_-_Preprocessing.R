@@ -14,7 +14,7 @@ library(ggplot2)
 
 ################################################################################################################################
 
-data <- read_excel("C:/Users/P70070766/Documents/Medication reconciliation/Data/QZExport104-Anoniem.xlsx", skip = 4)
+data <- read_excel("QZExport104-Anoniem.xlsx", skip = 4)
 colnames(data)[1] <- "id"
 table(is.na(data$id))
 data <- subset(data, id != "AGFspkFhsI") # All variables are missing for the ID equal to "AGFspkFhsI". Data entry error? Excluded.
@@ -76,72 +76,50 @@ data$age.cat <- ordered(data$age.cat, levels = c("< 18 years",
 
 ### diseases
 names(data)[names(data) == "A10a"] <- "diseases"
-data$diseases <- factor(data$diseases, 
-                        levels = c(1, 
-                                   2, 
-                                   3, 
-                                   4, 
-                                   5, 
-                                   6, 
-                                   7, 
-                                   8), 
-                        labels = c("diabetes", 
-                                   "rheumatoid arthritis", 
-                                   "asthma/COPD", 
-                                   "cardiovascular disease", 
-                                   "cardiac arrhythmia", 
-                                   "heart failure", 
-                                   "cancer", 
-                                   "none of the above"))
+diseases_split <- strsplit(data$diseases, ",")
 table(data$diseases, exclude = NULL)
-data$diseases.diabetes_1 <- ifelse(is.na(data$diseases), 
+data$diseases.diabetes_1 <- ifelse(is.na(diseases_split), 
                                    NA, 
-                                   0)
-data$diseases.diabetes_1 <- ifelse(data$diseases == "diabetes", 
-                                   1, 
-                                   data$diseases.diabetes_1)
-data$diseases.rheumatoid_arthritis_1 <- ifelse(is.na(data$diseases), 
+                                   ifelse(lapply(diseases_split, function(x) { "1" %in% x}), 
+                                          1, 
+                                          0))
+                                   
+data$diseases.rheumatoid_arthritis_1 <- ifelse(is.na(diseases_split), 
                                                NA, 
-                                               0)
-data$diseases.rheumatoid_arthritis_1 <- ifelse(data$diseases == "rheumatoid arthritis", 
-                                               1, 
-                                               data$diseases.rheumatoid_arthritis_1)
-data$diseases.asthma_COPD_1 <- ifelse(is.na(data$diseases), 
-                                      NA, 
-                                      0)
-data$diseases.asthma_COPD_1 <- ifelse(data$diseases == "asthma/COPD", 
-                                      1, 
-                                      data$diseases.asthma_COPD_1)
-data$diseases.cardiovascular_disease_1 <- ifelse(is.na(data$diseases), 
-                                                 NA, 
-                                                 0)
-data$diseases.cardiovascular_disease_1 <- ifelse(data$diseases == "cardiovascular disease", 
-                                                 1, 
-                                                 data$diseases.cardiovascular_disease_1)
-data$diseases.cardiac_arrhythmia_1 <- ifelse(is.na(data$diseases), 
+                                               ifelse(lapply(diseases_split, function(x) { "2" %in% x}), 
+                                                      1, 
+                                                      0))
+data$diseases.asthma_COPD_1 <- ifelse(is.na(diseases_split), 
                                              NA, 
-                                             0)
-data$diseases.cardiac_arrhythmia_1 <- ifelse(data$diseases == "cardiac arrhythmia", 
-                                             1, 
-                                             data$diseases.cardiac_arrhythmia_1)
-data$diseases.heart_failure_1 <- ifelse(is.na(data$diseases), 
+                                             ifelse(lapply(diseases_split, function(x) { "3" %in% x}), 
+                                                    1, 
+                                                    0))
+                                      
+data$diseases.cardiovascular_disease_1 <- ifelse(is.na(diseases_split), 
+                                                 NA, 
+                                                 ifelse(lapply(diseases_split, function(x) { "4" %in% x}), 
+                                                        1, 
+                                                        0)) 
+data$diseases.cardiac_arrhythmia_1 <- ifelse(is.na(diseases_split), 
+                                             NA, 
+                                             ifelse(lapply(diseases_split, function(x) { "5" %in% x}), 
+                                                    1, 
+                                                    0))
+data$diseases.heart_failure_1 <- ifelse(is.na(diseases_split), 
                                         NA, 
-                                        0)
-data$diseases.heart_failure_1 <- ifelse(data$diseases == "heart failure", 
-                                        1, 
-                                        data$diseases.heart_failure_1)
-data$diseases.cancer_1 <- ifelse(is.na(data$diseases), 
+                                        ifelse(lapply(diseases_split, function(x) { "6" %in% x}), 
+                                               1, 
+                                               0))
+data$diseases.cancer_1 <- ifelse(is.na(diseases_split), 
                                  NA, 
-                                 0)
-data$diseases.cancer_1 <- ifelse(data$diseases == "cancer", 
-                                 1, 
-                                 data$diseases.cancer_1)
-data$diseases.none_of_the_above_1 <- ifelse(is.na(data$diseases), 
+                                 ifelse(lapply(diseases_split, function(x) { "7" %in% x}), 
+                                        1, 
+                                        0))
+data$diseases.none_of_the_above_1 <- ifelse(is.na(diseases_split), 
                                             NA, 
-                                            0)
-data$diseases.none_of_the_above_1 <- ifelse(data$diseases == "none of the above", 
-                                            1, 
-                                            data$diseases.none_of_the_above_1)
+                                            ifelse(lapply(diseases_split, function(x) { "8" %in% x}), 
+                                                   1, 
+                                                   0))
 
 ### number of diseases
 names(data)[names(data) == "A9a"] <- "n_diseases"
@@ -211,139 +189,103 @@ data$n_visits_out_all_12m_MUMC.above_5_1 <- ifelse(data$n_visits_out_all_12m_MUM
                                                    0)
 
 ### visited specialty as outpatient and/or inpatient in past 12 months in MUMC+
-inout_specialty_12m_MUMC.list <- strsplit(data$A150a, ",")
-data$inout_specialty_12m_MUMC.cardiology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.cardiology_1[i] <- ifelse(1 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                          1, 
-                                                          0) 
-}
-table(data$inout_specialty_12m_MUMC.cardiology_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.urology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.urology_1[i] <- ifelse(2 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                       1, 
-                                                       0) 
-}
-table(data$inout_specialty_12m_MUMC.urology_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.psychiatry_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.psychiatry_1[i] <- ifelse(3 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                          1, 
-                                                          0) 
-}
-table(data$inout_specialty_12m_MUMC.psychiatry_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.otorhinolaryngology_1 <- 0 
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.otorhinolaryngology_1[i] <- ifelse(4 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                                   1, 
-                                                                   0) 
-}
-table(data$inout_specialty_12m_MUMC.otorhinolaryngology_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.ophthalmology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.ophthalmology_1[i] <- ifelse(5 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                             1, 
-                                                             0) 
-}
-table(data$inout_specialty_12m_MUMC.ophthalmology_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.internal_medicine_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.internal_medicine_1[i] <- ifelse(6 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                                 1, 
-                                                                 0) 
-}
-table(data$inout_specialty_12m_MUMC.internal_medicine_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.surgery_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.surgery_1[i] <- ifelse(7 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                       1, 
-                                                       0) 
-}
-table(data$inout_specialty_12m_MUMC.surgery_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.orthopedics_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.orthopedics_1[i] <- ifelse(8 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                           1, 
-                                                           0) 
-}
-table(data$inout_specialty_12m_MUMC.orthopedics_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.plastic_surgery_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.plastic_surgery_1[i] <- ifelse(9 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                               1, 
-                                                               0) 
-}
-table(data$inout_specialty_12m_MUMC.plastic_surgery_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1[i] <- ifelse(10 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                                          1, 
-                                                                          0) 
-}
-table(data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.neurology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.neurology_1[i] <- ifelse(11 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                         1, 
-                                                         0) 
-}
-table(data$inout_specialty_12m_MUMC.neurology_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.dermatology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.dermatology_1[i] <- ifelse(12 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                           1, 
-                                                           0) 
-}
-table(data$inout_specialty_12m_MUMC.dermatology_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.gastroenterology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.gastroenterology_1[i] <- ifelse(13 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                                1, 
-                                                                0) 
-}
-table(data$inout_specialty_12m_MUMC.gastroenterology_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.pneumology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.pneumology_1[i] <- ifelse(14 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                          1, 
-                                                          0) 
-}
-table(data$inout_specialty_12m_MUMC.pneumology_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.rheumatology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.rheumatology_1[i] <- ifelse(15 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
+inout_specialty_12m_MUMC.list <- strsplit(data$A150a, ",");
+data$inout_specialty_12m_MUMC.cardiology_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                     ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "1" %in% x}), 
                                                             1, 
-                                                            0) 
-}
-table(data$inout_specialty_12m_MUMC.rheumatology_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.do_not_select_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.do_not_select_1[i] <- ifelse(16 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                             1, 
-                                                             0) 
-}
-table(data$inout_specialty_12m_MUMC.do_not_select_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.pediatrics_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.pediatrics_1[i] <- ifelse(17 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                          1, 
-                                                          0) 
-}
-table(data$inout_specialty_12m_MUMC.pediatrics_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.anesthesiology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.anesthesiology_1[i] <- ifelse(18 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
+                                                            0)) 
+table(data$inout_specialty_12m_MUMC.cardiology_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.urology_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                  ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "2" %in% x}), 
+                                                         1, 
+                                                         0))  
+
+table(data$inout_specialty_12m_MUMC.urology_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.psychiatry_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                     ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "3" %in% x}), 
+                                                            1, 
+                                                            0))
+table(data$inout_specialty_12m_MUMC.psychiatry_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.otorhinolaryngology_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                              ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "4" %in% x}), 
+                                                                     1, 
+                                                                     0))
+
+table(data$inout_specialty_12m_MUMC.otorhinolaryngology_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.ophthalmology_1 <-ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                       ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "5" %in% x}), 
                                                               1, 
-                                                              0) 
-}
+                                                              0))
+table(data$inout_specialty_12m_MUMC.ophthalmology_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.internal_medicine_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                            ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "6" %in% x}), 
+                                                                   1, 
+                                                                   0))
+table(data$inout_specialty_12m_MUMC.internal_medicine_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.surgery_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                  ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "7" %in% x}), 
+                                                         1, 
+                                                         0))
+table(data$inout_specialty_12m_MUMC.surgery_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.orthopedics_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                      ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "8" %in% x}), 
+                                                             1, 
+                                                             0))
+table(data$inout_specialty_12m_MUMC.orthopedics_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.plastic_surgery_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                          ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "9" %in% x}), 
+                                                                 1, 
+                                                                 0))
+table(data$inout_specialty_12m_MUMC.plastic_surgery_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                                     ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "10" %in% x}), 
+                                                                            1, 
+                                                                            0))
+table(data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.neurology_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                    ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "11" %in% x}), 
+                                                           1, 
+                                                           0))
+table(data$inout_specialty_12m_MUMC.neurology_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.dermatology_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                      ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "12" %in% x}), 
+                                                             1, 
+                                                             0))
+table(data$inout_specialty_12m_MUMC.dermatology_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.gastroenterology_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                           ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "13" %in% x}), 
+                                                                  1, 
+                                                                  0)) 
+table(data$inout_specialty_12m_MUMC.gastroenterology_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.pneumology_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                     ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "14" %in% x}), 
+                                                            1, 
+                                                            0))
+table(data$inout_specialty_12m_MUMC.pneumology_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.rheumatology_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                       ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "15" %in% x}), 
+                                                              1, 
+                                                              0))
+table(data$inout_specialty_12m_MUMC.rheumatology_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.do_not_select_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                        ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "16" %in% x}), 
+                                                               1, 
+                                                               0))
+table(data$inout_specialty_12m_MUMC.do_not_select_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.pediatrics_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                     ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "17" %in% x}), 
+                                                            1, 
+                                                            0))
+table(data$inout_specialty_12m_MUMC.pediatrics_1, exclude = NULL)
+data$inout_specialty_12m_MUMC.anesthesiology_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                         ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "18" %in% x}), 
+                                                                1, 
+                                                                0))
 table(data$inout_specialty_12m_MUMC.anesthesiology_1, exclude = NULL)
-data$inout_specialty_12m_MUMC.other_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_MUMC.other_1[i] <- ifelse(19 %in% unlist(inout_specialty_12m_MUMC.list[i]), 
-                                                     1, 
-                                                     0) 
-}
+data$inout_specialty_12m_MUMC.other_1 <- ifelse(is.na(inout_specialty_12m_MUMC.list), NA, 
+                                                ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "19" %in% x}), 
+                                                       1, 
+                                                       0))
 table(data$inout_specialty_12m_MUMC.other_1, exclude = NULL)
 
 ### hospitalisation in past 12 months in MUMC+
@@ -373,78 +315,54 @@ table(data$n_medications, exclude = NULL)
 
 ### presence of following high-risk medications 
 high_risk_medications.list <- strsplit(data$B7a, ",")
-data$high_risk_medications.platelet_aggregation_inhibitors.yes_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$high_risk_medications.platelet_aggregation_inhibitors.yes_1[i] <- ifelse(1 %in% unlist(high_risk_medications.list[i]), 
-                                                                                1, 
-                                                                                0) 
-}
-data$high_risk_medications.anticoagulants.yes_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$high_risk_medications.anticoagulants.yes_1[i] <- ifelse(2 %in% unlist(high_risk_medications.list[i]), 
-                                                               1, 
-                                                               0) 
-}
-data$high_risk_medications.NSAIDs.yes_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$high_risk_medications.NSAIDs.yes_1[i] <- ifelse(3 %in% unlist(high_risk_medications.list[i]), 
-                                                       1, 
-                                                       0) 
-}
-data$high_risk_medications.diuretics.yes_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$high_risk_medications.diuretics.yes_1[i] <- ifelse(4 %in% unlist(high_risk_medications.list[i]), 
-                                                          1, 
-                                                          0) 
-}
-data$high_risk_medications.RAS_inhibitors.yes_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$high_risk_medications.RAS_inhibitors.yes_1[i] <- ifelse(5 %in% unlist(high_risk_medications.list[i]), 
-                                                               1, 
-                                                               0) 
-}
-data$high_risk_medications.systemic_corticosteroids.yes_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$high_risk_medications.systemic_corticosteroids.yes_1[i] <- ifelse(6 %in% unlist(high_risk_medications.list[i]), 
-                                                                         1,
-                                                                         0) 
-}
-data$high_risk_medications.opioids.yes_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$high_risk_medications.opioids.yes_1[i] <- ifelse(7 %in% unlist(high_risk_medications.list[i]), 
+data$high_risk_medications.platelet_aggregation_inhibitors.yes_1 <- ifelse(is.na(high_risk_medications.list), NA, 
+                                                                           ifelse(lapply(high_risk_medications.list, function(x) { "1" %in% x}), 
+                                                                                  1, 
+                                                                                  0))
+data$high_risk_medications.anticoagulants.yes_1 <- ifelse(is.na(high_risk_medications.list), NA, 
+                                                          ifelse(lapply(high_risk_medications.list, function(x) { "2" %in% x}), 
+                                                                 1, 
+                                                                 0))
+data$high_risk_medications.NSAIDs.yes_1 <-ifelse(is.na(high_risk_medications.list), NA, 
+                                                 ifelse(lapply(high_risk_medications.list, function(x) { "3" %in% x}), 
                                                         1, 
-                                                        0) 
-}
-data$high_risk_medications.glucose_lowering_medications.yes_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$high_risk_medications.glucose_lowering_medications.yes_1[i] <- ifelse(8 %in% unlist(high_risk_medications.list[i]), 
-                                                                             1,
-                                                                             0) 
-}
-data$high_risk_medications.psychotropics.yes_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$high_risk_medications.psychotropics.yes_1[i] <- ifelse(9 %in% unlist(high_risk_medications.list[i]), 
-                                                              1, 
-                                                              0) 
-}
-data$high_risk_medications.cardiac_medications.yes_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$high_risk_medications.cardiac_medications.yes_1[i] <- ifelse(10 %in% unlist(high_risk_medications.list[i]), 
-                                                                    1, 
-                                                                    0) 
-}
-data$high_risk_medications.immunosuppressants.yes_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$high_risk_medications.immunosuppressants.yes_1[i] <- ifelse(11 %in% unlist(high_risk_medications.list[i]), 
-                                                                   1,
-                                                                   0) 
-}
-data$high_risk_medications.oncolytics.yes_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$high_risk_medications.oncolytics.yes_1[i] <- ifelse(12 %in% unlist(high_risk_medications.list[i]),
-                                                           1, 
-                                                           0) 
-}
+                                                        0))
+data$high_risk_medications.diuretics.yes_1 <- ifelse(is.na(high_risk_medications.list), NA, 
+                                                     ifelse(lapply(high_risk_medications.list, function(x) { "4" %in% x}), 
+                                                            1, 
+                                                            0))
+data$high_risk_medications.RAS_inhibitors.yes_1 <- ifelse(is.na(high_risk_medications.list), NA, 
+                                                          ifelse(lapply(high_risk_medications.list, function(x) { "5" %in% x}), 
+                                                                 1, 
+                                                                 0))
+data$high_risk_medications.systemic_corticosteroids.yes_1 <- ifelse(is.na(high_risk_medications.list), NA, 
+                                                                    ifelse(lapply(high_risk_medications.list, function(x) { "6" %in% x}), 
+                                                                           1, 
+                                                                           0))
+data$high_risk_medications.opioids.yes_1 <- ifelse(is.na(high_risk_medications.list), NA, 
+                                                   ifelse(lapply(high_risk_medications.list, function(x) { "7" %in% x}), 
+                                                          1, 
+                                                          0))
+data$high_risk_medications.glucose_lowering_medications.yes_1 <- ifelse(is.na(high_risk_medications.list), NA, 
+                                                                        ifelse(lapply(high_risk_medications.list, function(x) { "8" %in% x}), 
+                                                                               1, 
+                                                                               0))
+data$high_risk_medications.psychotropics.yes_1 <- ifelse(is.na(high_risk_medications.list), NA, 
+                                                         ifelse(lapply(high_risk_medications.list, function(x) { "9" %in% x}), 
+                                                                1, 
+                                                                0))
+data$high_risk_medications.cardiac_medications.yes_1 <- ifelse(is.na(high_risk_medications.list), NA, 
+                                                               ifelse(lapply(high_risk_medications.list, function(x) { "10" %in% x}), 
+                                                                      1, 
+                                                                      0))
+data$high_risk_medications.immunosuppressants.yes_1 <- ifelse(is.na(high_risk_medications.list), NA, 
+                                                              ifelse(lapply(high_risk_medications.list, function(x) { "11" %in% x}), 
+                                                                     1, 
+                                                                     0))
+data$high_risk_medications.oncolytics.yes_1 <- ifelse(is.na(high_risk_medications.list), NA, 
+                                                      ifelse(lapply(high_risk_medications.list, function(x) { "12" %in% x}), 
+                                                             1, 
+                                                             0))
 
 data$high_risk_medications.cat <- ifelse(data$high_risk_medications.platelet_aggregation_inhibitors.yes_1 == 1,
                                          "platelet aggregation inhibitors",
@@ -789,138 +707,119 @@ data$visit_12m_other_hospital.yes_1 <- ifelse(data$visit_12m_other_hospital == "
 
 ### visited as outpatient and/or inpatient specialty in past 12 months in other hospital
 inout_specialty_12m_other_hospital.list <- strsplit(data$A150b, ",")
-data$inout_specialty_12m_other_hospital.cardiology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.cardiology_1[i] <- ifelse(1 %in% unlist(inout_specialty_12m_other_hospital.list[i]), 
-                                                                    1, 
-                                                                    0) 
-}
-table(data$inout_specialty_12m_other_hospital.cardiology_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.urology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.urology_1[i] <- ifelse(2 %in% unlist(inout_specialty_12m_other_hospital.list[i]), 
-                                                                 1, 
-                                                                 0) 
-}
-table(data$inout_specialty_12m_other_hospital.urology_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.psychiatry_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.psychiatry_1[i] <- ifelse(3 %in% unlist(inout_specialty_12m_other_hospital.list[i]), 
-                                                                    1, 
-                                                                    0) 
-}
-table(data$inout_specialty_12m_other_hospital.psychiatry_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.otorhinolaryngology_1 <- 0 
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.otorhinolaryngology_1[i] <- ifelse(4 %in% unlist(inout_specialty_12m_other_hospital.list[i]), 
-                                                                             1, 
-                                                                             0) 
-}
-table(data$inout_specialty_12m_other_hospital.otorhinolaryngology_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.ophthalmology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.ophthalmology_1[i] <- ifelse(5 %in% unlist(inout_specialty_12m_other_hospital.list[i]), 
-                                                                       1, 
-                                                                       0) 
-}
-table(data$inout_specialty_12m_other_hospital.ophthalmology_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.internal_medicine_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.internal_medicine_1[i] <- ifelse(6 %in% unlist(inout_specialty_12m_other_hospital.list[i]), 
-                                                                           1, 
-                                                                           0) 
-}
-table(data$inout_specialty_12m_other_hospital.internal_medicine_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.surgery_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.surgery_1[i] <- ifelse(7 %in% unlist(inout_specialty_12m_other_hospital.list[i]), 
-                                                                 1, 
-                                                                 0) 
-}
-table(data$inout_specialty_12m_other_hospital.surgery_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.orthopedics_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.orthopedics_1[i] <- ifelse(8 %in% unlist(inout_specialty_12m_other_hospital.list[i]), 
-                                                                     1, 
-                                                                     0) 
-}
-table(data$inout_specialty_12m_other_hospital.orthopedics_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.plastic_surgery_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.plastic_surgery_1[i] <- ifelse(9 %in% unlist(inout_specialty_12m_other_hospital.list[i]), 
-                                                                         1, 
-                                                                         0) 
-}
-table(data$inout_specialty_12m_other_hospital.plastic_surgery_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.obstetrics_and_gynaecology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.obstetrics_and_gynaecology_1[i] <- ifelse(10 %in% unlist(inout_specialty_12m_other_hospital.list[i]),
-                                                                                    1, 
-                                                                                    0) 
-}
-table(data$inout_specialty_12m_other_hospital.obstetrics_and_gynaecology_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.neurology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.neurology_1[i] <- ifelse(11 %in% unlist(inout_specialty_12m_other_hospital.list[i]), 
-                                                                   1, 
-                                                                   0) 
-}
-table(data$inout_specialty_12m_other_hospital.neurology_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.dermatology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.dermatology_1[i] <- ifelse(12 %in% unlist(inout_specialty_12m_other_hospital.list[i]), 
-                                                                     1, 
-                                                                     0) 
-}
-table(data$inout_specialty_12m_other_hospital.dermatology_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.gastroenterology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.gastroenterology_1[i] <- ifelse(13 %in% unlist(inout_specialty_12m_other_hospital.list[i]), 
-                                                                          1, 
-                                                                          0) 
-}
-table(data$inout_specialty_12m_other_hospital.gastroenterology_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.pneumology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.pneumology_1[i] <- ifelse(14 %in% unlist(inout_specialty_12m_other_hospital.list[i]), 
-                                                                    1, 
-                                                                    0) 
-}
-table(data$inout_specialty_12m_other_hospital.pneumology_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.rheumatology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.rheumatology_1[i] <- ifelse(15 %in% unlist(inout_specialty_12m_other_hospital.list[i]), 
+data$inout_specialty_12m_other_hospital.cardiology_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                               NA, 
+                                                               ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "1" %in% x}), 
                                                                       1, 
-                                                                      0) 
-}
-table(data$inout_specialty_12m_other_hospital.rheumatology_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.do_not_select_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.do_not_select_1[i] <- ifelse(16 %in% unlist(inout_specialty_12m_other_hospital.list[i]),
+                                                                      0))
+table(data$inout_specialty_12m_other_hospital.cardiology_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.urology_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                            NA, 
+                                                            ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "2" %in% x}), 
+                                                                   1, 
+                                                                   0))
+table(data$inout_specialty_12m_other_hospital.urology_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.psychiatry_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                               NA, 
+                                                               ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "3" %in% x}), 
+                                                                      1, 
+                                                                      0))
+table(data$inout_specialty_12m_other_hospital.psychiatry_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.otorhinolaryngology_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                                        NA, 
+                                                                        ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "4" %in% x}), 
+                                                                               1, 
+                                                                               0))
+table(data$inout_specialty_12m_other_hospital.otorhinolaryngology_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.ophthalmology_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                                  NA, 
+                                                                  ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "5" %in% x}), 
+                                                                         1, 
+                                                                         0))
+table(data$inout_specialty_12m_other_hospital.ophthalmology_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.internal_medicine_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                                      NA, 
+                                                                      ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "6" %in% x}), 
+                                                                             1, 
+                                                                             0))
+table(data$inout_specialty_12m_other_hospital.internal_medicine_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.surgery_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                            NA, 
+                                                            ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "7" %in% x}), 
+                                                                   1, 
+                                                                   0)) 
+table(data$inout_specialty_12m_other_hospital.surgery_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.orthopedics_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                                NA, 
+                                                                ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "8" %in% x}), 
                                                                        1, 
-                                                                       0) 
-}
-table(data$inout_specialty_12m_other_hospital.do_not_select_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.pediatrics_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.pediatrics_1[i] <- ifelse(17 %in% unlist(inout_specialty_12m_other_hospital.list[i]), 
-                                                                    1, 
-                                                                    0) 
-}
-table(data$inout_specialty_12m_other_hospital.pediatrics_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.anesthesiology_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.anesthesiology_1[i] <- ifelse(18 %in% unlist(inout_specialty_12m_other_hospital.list[i]),
+                                                                       0))
+table(data$inout_specialty_12m_other_hospital.orthopedics_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.plastic_surgery_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                                    NA, 
+                                                                    ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "9" %in% x}), 
+                                                                           1, 
+                                                                           0))
+table(data$inout_specialty_12m_other_hospital.plastic_surgery_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.obstetrics_and_gynaecology_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                                               NA, 
+                                                                               ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "10" %in% x}), 
+                                                                                      1, 
+                                                                                      0))
+table(data$inout_specialty_12m_other_hospital.obstetrics_and_gynaecology_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.neurology_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                              NA, 
+                                                              ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "11" %in% x}), 
+                                                                     1, 
+                                                                     0))
+table(data$inout_specialty_12m_other_hospital.neurology_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.dermatology_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                                NA, 
+                                                                ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "12" %in% x}), 
+                                                                       1, 
+                                                                       0))
+table(data$inout_specialty_12m_other_hospital.dermatology_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.gastroenterology_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                                     NA, 
+                                                                     ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "13" %in% x}), 
+                                                                            1, 
+                                                                            0))
+table(data$inout_specialty_12m_other_hospital.gastroenterology_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.pneumology_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                               NA, 
+                                                               ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "14" %in% x}), 
+                                                                      1, 
+                                                                      0))
+table(data$inout_specialty_12m_other_hospital.pneumology_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.rheumatology_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                                 NA, 
+                                                                 ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "15" %in% x}), 
                                                                         1, 
-                                                                        0) 
-}
+                                                                        0))
+table(data$inout_specialty_12m_other_hospital.rheumatology_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.do_not_select_1 <-ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                                 NA, 
+                                                                 ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "16" %in% x}), 
+                                                                        1, 
+                                                                        0))
+table(data$inout_specialty_12m_other_hospital.do_not_select_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.pediatrics_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                               NA, 
+                                                               ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "17" %in% x}), 
+                                                                      1, 
+                                                                      0))
+table(data$inout_specialty_12m_other_hospital.pediatrics_1, exclude = NULL)
+data$inout_specialty_12m_other_hospital.anesthesiology_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                                   NA, 
+                                                                   ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "18" %in% x}), 
+                                                                          1, 
+                                                                          0))
 table(data$inout_specialty_12m_other_hospital.anesthesiology_1, exclude = NULL)
-data$inout_specialty_12m_other_hospital.other_1 <- 0
-for (i in 1 : nrow(data)) { 
-  data$inout_specialty_12m_other_hospital.other_1[i] <- ifelse(19 %in% unlist(inout_specialty_12m_other_hospital.list[i]), 
-                                                               1, 
-                                                               0) 
-}
+data$inout_specialty_12m_other_hospital.other_1 <- ifelse(is.na(inout_specialty_12m_other_hospital.list), 
+                                                          NA, 
+                                                          ifelse(lapply(inout_specialty_12m_other_hospital.list, function(x) { "19" %in% x}), 
+                                                                 1, 
+                                                                 0))
 table(data$inout_specialty_12m_other_hospital.other_1, exclude = NULL)
 
 ### hospitalisation in past 12 months in other hospital
@@ -947,6 +846,8 @@ data$ER_12m_other_hospital.yes_1 <- ifelse(data$n_ER_12m_other_hospital == 0,
 
 ### medication without prescription
 names(data)[names(data) == "B2b"] <- "medication_without_prescription"
+medication_without_prescription.list <- strsplit(data$medication_without_prescription, ",")
+
 data$medication_without_prescription <- factor(data$medication_without_prescription, 
                                                levels = c(1, 
                                                           2, 
@@ -963,58 +864,48 @@ data$medication_without_prescription <- factor(data$medication_without_prescript
                                                           "other", 
                                                           "none"))
 table(data$medication_without_prescription, exclude = NULL)
-data$medication_without_prescription.NSAIDs_1 <- ifelse(is.na(data$medication_without_prescription), 
+data$medication_without_prescription.NSAIDs_1 <- ifelse(is.na(medication_without_prescription.list), 
                                                         NA, 
-                                                        0)
-data$medication_without_prescription.NSAIDs_1 <- ifelse(data$medication_without_prescription == "NSAIDs", 
-                                                        1, 
-                                                        data$medication_without_prescription.NSAIDs_1)
-data$medication_without_prescription.proton_pump_inhibitors_1 <- ifelse(is.na(data$medication_without_prescription), 
+                                                        ifelse(lapply(medication_without_prescription.list, function(x) { "1" %in% x}), 
+                                                               1, 
+                                                               0))
+
+data$medication_without_prescription.proton_pump_inhibitors_1 <- ifelse(is.na(medication_without_prescription.list), 
                                                                         NA, 
-                                                                        0)
-data$medication_without_prescription.proton_pump_inhibitors_1 <- ifelse(data$medication_without_prescription == "proton pump inhibitors", 
-                                                                        1, 
-                                                                        data$medication_without_prescription.proton_pump_inhibitors_1)
-data$medication_without_prescription.hypericum_1 <- ifelse(is.na(data$medication_without_prescription), 
+                                                                        ifelse(lapply(medication_without_prescription.list, function(x) { "2" %in% x}), 
+                                                                               1, 
+                                                                               0))
+data$medication_without_prescription.hypericum_1 <- ifelse(is.na(medication_without_prescription.list), 
                                                            NA, 
-                                                           0)
-data$medication_without_prescription.hypericum_1 <- ifelse(data$medication_without_prescription == "hypericum", 
-                                                           1, 
-                                                           data$medication_without_prescription.hypericum_1)
-data$medication_without_prescription.red_yeast_rice_1 <- ifelse(is.na(data$medication_without_prescription), 
+                                                           ifelse(lapply(medication_without_prescription.list, function(x) { "3" %in% x}), 
+                                                                  1, 
+                                                                  0))
+data$medication_without_prescription.red_yeast_rice_1 <- ifelse(is.na(medication_without_prescription.list), 
                                                                 NA, 
-                                                                0)
-data$medication_without_prescription.red_yeast_rice_1 <- ifelse(data$medication_without_prescription == "red yeast rice", 
-                                                                1, 
-                                                                data$medication_without_prescription.red_yeast_rice_1)
-data$medication_without_prescription.multi_vitamins_dietary_supplement_1 <- ifelse(is.na(data$medication_without_prescription), 
+                                                                ifelse(lapply(medication_without_prescription.list, function(x) { "4" %in% x}), 
+                                                                       1, 
+                                                                       0))
+data$medication_without_prescription.multi_vitamins_dietary_supplement_1 <- ifelse(is.na(medication_without_prescription.list), 
                                                                                    NA, 
-                                                                                   0)
-data$medication_without_prescription.multi_vitamins_dietary_supplement_1 <- ifelse(data$medication_without_prescription == "multi vitamins / dietary supplement", 
-                                                                                   1, 
-                                                                                   data$medication_without_prescription.multi_vitamins_dietary_supplement_1)
-data$medication_without_prescription.other_1 <- ifelse(is.na(data$medication_without_prescription), 
+                                                                                   ifelse(lapply(medication_without_prescription.list, function(x) { "5" %in% x}), 
+                                                                                          1, 
+                                                                                          0))
+data$medication_without_prescription.other_1 <- ifelse(is.na(medication_without_prescription.list), 
                                                        NA, 
-                                                       0)
-data$medication_without_prescription.other_1 <- ifelse(data$medication_without_prescription == "other", 
-                                                       1, 
-                                                       data$medication_without_prescription.other_1)
-data$medication_without_prescription.none_1 <- ifelse(is.na(data$medication_without_prescription), 
+                                                       ifelse(lapply(medication_without_prescription.list, function(x) { "6" %in% x}), 
+                                                              1, 
+                                                              0))
+data$medication_without_prescription.none_1 <- ifelse(is.na(medication_without_prescription.list), 
                                                       NA, 
-                                                      0)
-data$medication_without_prescription.none_1 <- ifelse(data$medication_without_prescription == "none", 
-                                                      1, 
-                                                      data$medication_without_prescription.none_1)
+                                                      ifelse(lapply(medication_without_prescription.list, function(x) { "7" %in% x}), 
+                                                             1, 
+                                                             0))
 
 table(data$medication_without_prescription.NSAIDs_1, data$high_risk_medications.NSAIDs.yes_1, exclude = NULL)
 data$NSAIDs_composite.yes_1 <- ifelse((data$medication_without_prescription.NSAIDs_1 == 1) |
                                         (data$high_risk_medications.NSAIDs.yes_1 == 1),
                                       1, 
                                       0)
-data$NSAIDs_composite.yes_1 <- ifelse(is.na(data$NSAIDs_composite.yes_1), 
-                                      0, 
-                                      data$NSAIDs_composite.yes_1)
-
 # Part 3
 
 ### medication literacy
