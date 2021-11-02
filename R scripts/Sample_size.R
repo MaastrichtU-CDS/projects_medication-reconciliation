@@ -10,7 +10,7 @@ source("C:\\Users\\P70070766\\Documents\\Medication reconciliation\\Scripts\\202
 rm(list = setdiff(ls(), "data"))
 
 ## Criterion B1: Intercept with a margin of error of 0.05
-
+## Inigo's change
 fun.B1 <- function(prop_prior) { 
   ( 1.96 / 0.05 ) ** 2 * prop_prior * ( 1 - prop_prior ) 
   }
