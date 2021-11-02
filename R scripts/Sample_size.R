@@ -1,7 +1,7 @@
 # Investigating sample size criteria Riley et al. (2020)
 
 
-# Change ##
+# Change We are changing the same line
 
 
 ## Source preprocessed data
@@ -11,8 +11,8 @@ rm(list = setdiff(ls(), "data"))
 
 ## Criterion B1: Intercept with a margin of error of 0.05
 ## Inigo's change
-fun.B1 <- function(prop_prior) { 
-  ( 1.96 / 0.05 ) ** 2 * prop_prior * ( 1 - prop_prior ) 
+fun.B1 <- function(prop_prior) {
+  ( 1.96 / 0.05 ) ** 2 * prop_prior * ( 1 - prop_prior )
   }
 
 data.graph.prop.y <- data[, c("id", "y")]
@@ -26,7 +26,7 @@ ggplot(data.graph.prop.y, aes(x = entry, y = prop.y)) +
   geom_point(aes(x = data.graph.prop.y[1526,]$entry, y = data.graph.prop.y[1077,]$prop.y), colour = "orangered", shape = 18, size = 5) +
   scale_y_continuous(name = "Proportion of events: composite end-point(%)", breaks = seq(0, 0.080, 0.005), labels = format(seq(0, 8, 0.5), digits = 2)) +
   scale_x_continuous(name = "Entry number", breaks = seq(0, 1600, 100)) +
-  theme_minimal() 
+  theme_minimal()
 
 max(subset(data.graph.prop.y, entry >= 1000)$prop.y)
 min(subset(data.graph.prop.y, entry >= 1000)$prop.y)
@@ -66,7 +66,7 @@ ggplot(subset(n.B2, prop_prior == 0.04), aes(x = MAPE, y = n, colour = as.factor
   scale_y_continuous(name = "Number of patients", breaks = seq(0, 35000, 1000)) +
   scale_x_continuous(name = "Mean Absolute Prediction Error (MAPE)", breaks = seq(0.005, 0.050, 0.005), labels = format(seq(0.005, 0.050, 0.005), digits = 2)) +
   scale_color_discrete(name = "Number of candidate parameters") +
-  ggtitle("Specified proportion of events (composite end-point): 4.0 %") + 
+  ggtitle("Specified proportion of events (composite end-point): 4.0 %") +
   theme_minimal()
 
 ggplot(subset(n.B2, (prop_prior == 0.04) & (MAPE != 0.005)), aes(x = MAPE, y = n, colour = as.factor(p_cand))) +
@@ -75,7 +75,7 @@ ggplot(subset(n.B2, (prop_prior == 0.04) & (MAPE != 0.005)), aes(x = MAPE, y = n
   scale_y_continuous(name = "Number of patients", breaks = seq(0, 35000, 1000)) +
   scale_x_continuous(name = "Mean Absolute Prediction Error (MAPE)", breaks = seq(0.010, 0.050, 0.005), labels = format(seq(0.010, 0.050, 0.005), digits = 2)) +
   scale_color_discrete(name = "Number of candidate parameters") +
-  ggtitle("Specified proportion of events (composite end-point): 4.0 %") + 
+  ggtitle("Specified proportion of events (composite end-point): 4.0 %") +
   theme_minimal()
 
 ggplot(subset(n.B2, prop_prior == 0.045), aes(x = MAPE, y = n, colour = as.factor(p_cand))) +
@@ -84,7 +84,7 @@ ggplot(subset(n.B2, prop_prior == 0.045), aes(x = MAPE, y = n, colour = as.facto
   scale_y_continuous(name = "Number of patients", breaks = seq(0, 35000, 1000)) +
   scale_x_continuous(name = "Mean Absolute Prediction Error (MAPE)", breaks = seq(0.005, 0.050, 0.005), labels = format(seq(0.005, 0.050, 0.005), digits = 2)) +
   scale_color_discrete(name = "Number of candidate parameters") +
-  ggtitle("Specified proportion of events (composite end-point): 4.5 %") + 
+  ggtitle("Specified proportion of events (composite end-point): 4.5 %") +
   theme_minimal()
 
 ggplot(subset(n.B2, (prop_prior == 0.045) & (MAPE != 0.005)), aes(x = MAPE, y = n, colour = as.factor(p_cand))) +
@@ -93,7 +93,7 @@ ggplot(subset(n.B2, (prop_prior == 0.045) & (MAPE != 0.005)), aes(x = MAPE, y = 
   scale_y_continuous(name = "Number of patients", breaks = seq(0, 35000, 1000)) +
   scale_x_continuous(name = "Mean Absolute Prediction Error (MAPE)", breaks = seq(0.010, 0.050, 0.005), labels = format(seq(0.010, 0.050, 0.005), digits = 2)) +
   scale_color_discrete(name = "Number of candidate parameters") +
-  ggtitle("Specified proportion of events (composite end-point): 4.5 %") + 
+  ggtitle("Specified proportion of events (composite end-point): 4.5 %") +
   theme_minimal()
 
 ggplot(subset(n.B2, prop_prior == 0.05), aes(x = MAPE, y = n, colour = as.factor(p_cand))) +
@@ -102,7 +102,7 @@ ggplot(subset(n.B2, prop_prior == 0.05), aes(x = MAPE, y = n, colour = as.factor
   scale_y_continuous(name = "Number of patients", breaks = seq(0, 35000, 1000)) +
   scale_x_continuous(name = "Mean Absolute Prediction Error (MAPE)", breaks = seq(0.005, 0.050, 0.005), labels = format(seq(0.005, 0.050, 0.005), digits = 2)) +
   scale_color_discrete(name = "Number of candidate parameters") +
-  ggtitle("Specified proportion of events (composite end-point): 5.0 %") + 
+  ggtitle("Specified proportion of events (composite end-point): 5.0 %") +
   theme_minimal()
 
 ggplot(subset(n.B2, (prop_prior == 0.05) & (MAPE != 0.005)), aes(x = MAPE, y = n, colour = as.factor(p_cand))) +
@@ -111,14 +111,14 @@ ggplot(subset(n.B2, (prop_prior == 0.05) & (MAPE != 0.005)), aes(x = MAPE, y = n
   scale_y_continuous(name = "Number of patients", breaks = seq(0, 35000, 1000)) +
   scale_x_continuous(name = "Mean Absolute Prediction Error (MAPE)", breaks = seq(0.010, 0.050, 0.005), labels = format(seq(0.010, 0.050, 0.005), digits = 2)) +
   scale_color_discrete(name = "Number of candidate parameters") +
-  ggtitle("Specified proportion of events (composite end-point): 5.0 %") + 
+  ggtitle("Specified proportion of events (composite end-point): 5.0 %") +
   theme_minimal()
 
 ## Criterion B3: Shrinkage factor of 0.90
 
-fun.B3 <- function(cand_p, s, Rsqcs) { 
-  ( cand_p ) / ( (s - 1) * log( 1 - Rsqcs / s) ) 
-} 
+fun.B3 <- function(cand_p, s, Rsqcs) {
+  ( cand_p ) / ( (s - 1) * log( 1 - Rsqcs / s) )
+}
 
 fun.lnLnull <- function(n_events, n_patients) {
   n_events * log( n_events / n_patients ) + ( n_patients - n_events ) * log( 1 - n_events / n_patients )
@@ -134,19 +134,19 @@ data.maxRsqcs <- fun.maxRsqcs(lnLnull = data.lnLnull, n_patients = 1526)
 
 Rsqn.data.Rsqcs <- as.data.frame(matrix(nrow = 4, ncol = 2))
 colnames(Rsqn.data.Rsqcs) <- c('Rsqn', 'data.Rsqcs')
-Rsqn.data.Rsqcs[1, 1] <- 0.15 
+Rsqn.data.Rsqcs[1, 1] <- 0.15
 Rsqn.data.Rsqcs[1, 2] <- 0.15 * data.maxRsqcs
 Rsqn.data.Rsqcs[2, 1] <- 0.10
 Rsqn.data.Rsqcs[2, 2] <- 0.10 * data.maxRsqcs
 Rsqn.data.Rsqcs[3, 1] <- 0.05
 Rsqn.data.Rsqcs[3, 2] <- 0.05 * data.maxRsqcs
-Rsqn.data.Rsqcs[4, 1] <- 0.01 
+Rsqn.data.Rsqcs[4, 1] <- 0.01
 Rsqn.data.Rsqcs[4, 2] <- 0.01 * data.maxRsqcs
 
 n.B3 <- expand.grid(Rsqn.data.Rsqcs$data.Rsqcs, 1:30)
 n.B3 <- cbind(n.B3, NA)
 colnames(n.B3) <- c('data.Rsqcs', 'p_cand', 'n')
-n.B3$n <- apply(n.B3, 1, function(n.B3) ( n.B3[2] ) / ( ( 0.90 - 1) * log( 1 - n.B3[1] / 0.90 ) )) 
+n.B3$n <- apply(n.B3, 1, function(n.B3) ( n.B3[2] ) / ( ( 0.90 - 1) * log( 1 - n.B3[1] / 0.90 ) ))
 n.B3 <- as.data.frame(n.B3)
 
 ggplot(n.B3, aes(x = p_cand, y = n, color = as.factor(data.Rsqcs))) +
@@ -177,7 +177,7 @@ fun.s.optimism <- function(Rsqcs, optimism, maxRsqcs) {
 n.B4 <- Rsqn.data.Rsqcs
 n.B4$data.maxRsqcs <- data.maxRsqcs
 n.B4$optimism <- 0.05
-n.B4$s.optimism <- apply(n.B4, 1, function(n.B4) n.B4[2] / ( n.B4[2] + n.B4[4] * n.B4[3] )) 
+n.B4$s.optimism <- apply(n.B4, 1, function(n.B4) n.B4[2] / ( n.B4[2] + n.B4[4] * n.B4[3] ))
 n.B4 <- merge(n.B4, 1:30, by = NULL)
 colnames(n.B4)[6] <- 'p_cand'
 n.B4$n <- apply(n.B4, 1, function(n.B4) ( n.B4[6] ) / ( ( n.B4[5] - 1 ) * log( 1 - n.B4[2] / n.B4[5] ) ))
@@ -200,7 +200,7 @@ fun.B1(prop_prior = 0.50) # Fig. 1, page 9: 384.2
 
 fun.B2(prop_prior = 0.30, p_cand = 10, MAPE = 0.050) # Fig. 2, page 10: 460.9
 
-fun.B3(cand_p = 20, s = 0.90, Rsqcs = 0.10) # Fig. 3, page 10: 1698 
+fun.B3(cand_p = 20, s = 0.90, Rsqcs = 0.10) # Fig. 3, page 10: 1698
 
 fun.lnLnull(n_events = 50, n_patients = 100) # Supplementary material, S5, page 5: -69.315
 
@@ -216,13 +216,10 @@ library('pmsampsize')
 
 pmsampsize(type = "b", rsquared = 0.046220050, parameters = 30, prevalence = .045)
 
-n.B1[6,] # Criterion B1 = Criteria 3 
+n.B1[6,] # Criterion B1 = Criteria 3
 
 n.B3[117,] # Criterion B3 = Criteria 1
 
 n.B4[117,] # Criterion B4 = Criteria 2 # Difference likely due to rounding.
 fun.B3(cand_p = 30, s = 0.750, Rsqcs = 0.046220050)
-fun.B3(cand_p = 30, s = 0.749, Rsqcs = 0.046220050) 
-
-
-
+fun.B3(cand_p = 30, s = 0.749, Rsqcs = 0.046220050)
