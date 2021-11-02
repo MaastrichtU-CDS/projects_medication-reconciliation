@@ -1,5 +1,3 @@
-## Change
-
 # Investigating sample size criteria Riley et al. (2020)
 
 ## Source preprocessed data
