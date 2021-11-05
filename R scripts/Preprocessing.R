@@ -1,20 +1,20 @@
 
-################################################################################################################################
+########################################################################################################################
 
 # Packages
 
-################################################################################################################################
+########################################################################################################################
 
 library(readxl)
 library(ggplot2)
 
-################################################################################################################################
+########################################################################################################################
 
 # Data 
 
-################################################################################################################################
+########################################################################################################################
 
-data <- read_excel("QZExport104-Anoniem.xlsx", skip = 4)
+data <- read_excel("./QZExport104-Anoniem.xlsx", skip = 4)
 colnames(data)[1] <- "id"
 table(is.na(data$id))
 data <- subset(data, id != "AGFspkFhsI") # All variables are missing for the ID equal to "AGFspkFhsI". Data entry error? Excluded.
@@ -23,11 +23,11 @@ data <- subset(data, (id %in% dup_id) == FALSE) # Duplicate ids: same id for mul
 data <- subset(data, id != "7EGpgbdhnP") # Many missing values. Data entry error? Excluded.
 table(is.na(data$id))
 
-################################################################################################################################
+########################################################################################################################
 
 # Coding responses 
 
-################################################################################################################################
+########################################################################################################################
 
 # Part 1 
 
@@ -80,28 +80,28 @@ diseases.list <- strsplit(data$diseases, ",")
 table(data$diseases, exclude = NULL) # '8. None of the above' was never selected. 
 data$diseases.diabetes_1 <- ifelse(lapply(diseases.list, function(x) { "1" %in% x}),
                                    1, 
-                                   0) # Assumption NA equals to no.
+                                   0) # Assumption NA equals to negative indication.
 data$diseases.rheumatoid_arthritis_1 <- ifelse(lapply(diseases.list, function(x) { "2" %in% x}),
                                                1, 
-                                               0) # Assumption NA equals to no. 
+                                               0) # Assumption NA equals to negative indication. 
 data$diseases.asthma_COPD_1 <- ifelse(lapply(diseases.list, function(x) { "3" %in% x}),
                                       1, 
-                                      0) # Assumption NA equals to no. 
+                                      0) # Assumption NA equals to negative indication. 
 data$diseases.cardiovascular_disease_1 <- ifelse(lapply(diseases.list, function(x) { "4" %in% x}),
                                                  1, 
-                                                 0) # Assumption NA equals to no.
+                                                 0) # Assumption NA equals to negative indication.
 data$diseases.cardiac_arrhythmia_1 <- ifelse(lapply(diseases.list, function(x) { "5" %in% x}),
                                              1, 
-                                             0) # Assumption NA equals to no.
+                                             0) # Assumption NA equals to negative indication.
 data$diseases.heart_failure_1 <- ifelse(lapply(diseases.list, function(x) { "6" %in% x}),
                                         1, 
-                                        0) # Assumption NA equals to no.
+                                        0) # Assumption NA equals to negative indication.
 data$diseases.cancer_1 <- ifelse(lapply(diseases.list, function(x) { "7" %in% x}),
                                  1, 
-                                 0) # Assumption NA equals to no.
+                                 0) # Assumption NA equals to negative indication.
 data$diseases.none_of_the_above_1 <- ifelse(lapply(diseases.list, function(x) { "8" %in% x}),
                                             1, 
-                                            0) # Assumption NA equals to no. 
+                                            0) # Assumption NA equals to negative indication. 
 
 ### number of diseases
 names(data)[names(data) == "A9a"] <- "n_diseases"
@@ -171,82 +171,82 @@ data$n_visits_out_all_12m_MUMC.above_5_1 <- ifelse(data$n_visits_out_all_12m_MUM
                                                    0)
 
 ### visited specialty as outpatient and/or inpatient in past 12 months in MUMC+
-inout_specialty_12m_MUMC.list <- strsplit(data$A150a, ",");
+inout_specialty_12m_MUMC.list <- strsplit(data$A150a, ",")
 data$inout_specialty_12m_MUMC.cardiology_1 <-ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "1" %in% x}), 
                                                     1, 
-                                                    0) # Assumption NA equals to no.
+                                                    0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.cardiology_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.urology_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "2" %in% x}),
                                                   1, 
-                                                  0) # Assumption NA equals to no. 
+                                                  0) # Assumption NA equals to negative indication. 
 table(data$inout_specialty_12m_MUMC.urology_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.psychiatry_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "3" %in% x}), 
                                                      1, 
-                                                     0) # Assumption NA equals to no.
+                                                     0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.psychiatry_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.otorhinolaryngology_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "4" %in% x}),
                                                               1, 
-                                                              0) # Assumption NA equals to no.
+                                                              0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.otorhinolaryngology_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.ophthalmology_1 <-ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "5" %in% x}),
                                                        1, 
-                                                       0) # Assumption NA equals to no.
+                                                       0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.ophthalmology_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.internal_medicine_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "6" %in% x}),
                                                             1, 
-                                                            0) # Assumption NA equals to no.
+                                                            0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.internal_medicine_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.surgery_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "7" %in% x}),
                                                   1, 
-                                                  0) # Assumption NA equals to no.
+                                                  0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.surgery_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.orthopedics_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "8" %in% x}),
                                                       1, 
-                                                      0) # Assumption NA equals to no.
+                                                      0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.orthopedics_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.plastic_surgery_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "9" %in% x}),
                                                           1, 
-                                                          0) # Assumption NA equals to no.
+                                                          0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.plastic_surgery_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "10" %in% x}),
                                                                      1,
-                                                                     0) # Assumption NA equals to no.
+                                                                     0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.neurology_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "11" %in% x}),
                                                     1, 
-                                                    0) # Assumption NA equals to no.
+                                                    0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.neurology_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.dermatology_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "12" %in% x}),
                                                       1, 
-                                                      0) # Assumption NA equals to no.
+                                                      0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.dermatology_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.gastroenterology_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "13" %in% x}),
                                                            1, 
-                                                           0) # Assumption NA equals to no. 
+                                                           0) # Assumption NA equals to negative indication. 
 table(data$inout_specialty_12m_MUMC.gastroenterology_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.pneumology_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "14" %in% x}),
                                                      1, 
-                                                     0) # Assumption NA equals to no.
+                                                     0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.pneumology_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.rheumatology_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "15" %in% x}),
                                                        1, 
-                                                       0) # Assumption NA equals to no.
+                                                       0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.rheumatology_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.do_not_select_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "16" %in% x}), 
                                                         1, 
-                                                        0) # Assumption NA equals to no.
+                                                        0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.do_not_select_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.pediatrics_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "17" %in% x}), 
                                                      1, 
-                                                     0) # Assumption NA equals to no.
+                                                     0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.pediatrics_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.anesthesiology_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "18" %in% x}), 
                                                          1, 
-                                                         0) # Assumption NA equals to no.
+                                                         0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.anesthesiology_1, exclude = NULL)
 data$inout_specialty_12m_MUMC.other_1 <- ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "19" %in% x}),
                                                 1, 
-                                                0) # Assumption NA equals to no.
+                                                0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.other_1, exclude = NULL)
 
 ### hospitalisation in past 12 months in MUMC+
@@ -278,40 +278,40 @@ table(data$n_medications, exclude = NULL)
 high_risk_medications.list <- strsplit(data$B7a, ",")
 data$high_risk_medications.platelet_aggregation_inhibitors.yes_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "1" %in% x}),
                                                                            1, 
-                                                                           0) # Assumption NA equals to no. 
+                                                                           0) # Assumption NA equals to negative indication. 
 data$high_risk_medications.anticoagulants.yes_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "2" %in% x}),
                                                           1, 
-                                                          0) # Assumption NA equals to no.
+                                                          0) # Assumption NA equals to negative indication.
 data$high_risk_medications.NSAIDs.yes_1 <-ifelse(lapply(high_risk_medications.list, function(x) { "3" %in% x}), 
                                                  1, 
-                                                 0) # Assumption NA equals to no.
+                                                 0) # Assumption NA equals to negative indication.
 data$high_risk_medications.diuretics.yes_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "4" %in% x}),
                                                      1, 
-                                                     0) # Assumption NA equals to no.
+                                                     0) # Assumption NA equals to negative indication.
 data$high_risk_medications.RAS_inhibitors.yes_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "5" %in% x}),
                                                           1, 
-                                                          0) # Assumption NA equals to no.
+                                                          0) # Assumption NA equals to negative indication.
 data$high_risk_medications.systemic_corticosteroids.yes_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "6" %in% x}), 
                                                                     1, 
-                                                                    0) # Assumption NA equals to no.
+                                                                    0) # Assumption NA equals to negative indication.
 data$high_risk_medications.opioids.yes_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "7" %in% x}),
                                                    1, 
-                                                   0) # Assumption NA equals to no.
+                                                   0) # Assumption NA equals to negative indication.
 data$high_risk_medications.glucose_lowering_medications.yes_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "8" %in% x}),
                                                                         1, 
-                                                                        0) # Assumption NA equals to no.
+                                                                        0) # Assumption NA equals to negative indication.
 data$high_risk_medications.psychotropics.yes_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "9" %in% x}),
                                                          1, 
-                                                         0) # Assumption NA equals to no.
+                                                         0) # Assumption NA equals to negative indication.
 data$high_risk_medications.cardiac_medications.yes_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "10" %in% x}),
                                                                1, 
-                                                               0) # Assumption NA equals to no.
+                                                               0) # Assumption NA equals to negative indication.
 data$high_risk_medications.immunosuppressants.yes_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "11" %in% x}),
                                                               1, 
-                                                              0) # Assumption NA equals to no.
+                                                              0) # Assumption NA equals to negative indication.
 data$high_risk_medications.oncolytics.yes_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "12" %in% x}),
                                                       1, 
-                                                      0) # Assumption NA equals to no.
+                                                      0) # Assumption NA equals to negative indication.
 
 ### high-risk medications
 names(data)[names(data) == "B6a"] <- "high_risk_medications"
@@ -624,79 +624,79 @@ data$visit_12m_external_hospital.yes_1 <- ifelse(data$visit_12m_external_hospita
 inout_specialty_12m_external_hospital.list <- strsplit(data$A150b, ",")
 data$inout_specialty_12m_external_hospital.cardiology_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "1" %in% x}),
                                                                1, 
-                                                               0) # Assumption NA equals to no.
+                                                               0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.cardiology_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.urology_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "2" %in% x}),
                                                             1, 
-                                                            0) # Assumption NA equals to no.
+                                                            0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.urology_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.psychiatry_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "3" %in% x}),
                                                                1, 
-                                                               0) # Assumption NA equals to no.
+                                                               0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.psychiatry_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.otorhinolaryngology_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "4" %in% x}),
                                                                         1, 
-                                                                        0) # Assumption NA equals to no.
+                                                                        0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.otorhinolaryngology_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.ophthalmology_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "5" %in% x}), 
                                                                          1, 
-                                                                         0) # Assumption NA equals to no.
+                                                                         0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.ophthalmology_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.internal_medicine_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "6" %in% x}), 
                                                                              1, 
-                                                                             0) # Assumption NA equals to no.
+                                                                             0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.internal_medicine_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.surgery_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "7" %in% x}),
                                                             1, 
-                                                            0) # Assumption NA equals to no.
+                                                            0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.surgery_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.orthopedics_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "8" %in% x}), 
                                                                 1, 
-                                                                0) # Assumption NA equals to no.
+                                                                0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.orthopedics_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.plastic_surgery_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "9" %in% x}),
                                                                     1, 
-                                                                    0) # Assumption NA equals to no.
+                                                                    0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.plastic_surgery_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.obstetrics_and_gynaecology_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "10" %in% x}),
                                                                                1, 
-                                                                               0) # Assumption NA equals to no.
+                                                                               0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.obstetrics_and_gynaecology_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.neurology_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "11" %in% x}),
                                                               1, 
-                                                              0) # Assumption NA equals to no.
+                                                              0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.neurology_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.dermatology_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "12" %in% x}),
                                                                 1, 
-                                                                0) # Assumption NA equals to no.
+                                                                0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.dermatology_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.gastroenterology_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "13" %in% x}),
                                                                      1, 
-                                                                     0) # Assumption NA equals to no.
+                                                                     0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.gastroenterology_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.pneumology_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "14" %in% x}), 
                                                                1, 
-                                                               0) # Assumption NA equals to no.
+                                                               0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.pneumology_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.rheumatology_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "15" %in% x}),
                                                                  1, 
-                                                                 0) # Assumption NA equals to no.
+                                                                 0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.rheumatology_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.do_not_select_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "16" %in% x}), 
                                                                   1, 
-                                                                  0) # Assumption NA equals to no.
+                                                                  0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.do_not_select_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.pediatrics_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "17" %in% x}), 
                                                                1, 
-                                                               0) # Assumption NA equals to no.
+                                                               0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.pediatrics_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.anesthesiology_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "18" %in% x}),
                                                                    1, 
-                                                                   0) # Assumption NA equals to no.
+                                                                   0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.anesthesiology_1, exclude = NULL)
 data$inout_specialty_12m_external_hospital.other_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "19" %in% x}),
                                                           1, 
-                                                          0) # Assumption NA equals to no.
+                                                          0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.other_1, exclude = NULL)
 
 ### hospitalisation in past 12 months in external hospital
@@ -722,63 +722,46 @@ data$ER_12m_external_hospital.yes_1 <- ifelse(data$n_ER_12m_external_hospital ==
                                            1)
 
 ### medication without prescription
-names(data)[names(data) == "B2b"] <- "medication_without_prescription"
-medication_without_prescription.list <- strsplit(data$medication_without_prescription, ",")
-
-data$medication_without_prescription <- factor(data$medication_without_prescription, 
-                                               levels = c(1, 
-                                                          2, 
-                                                          3, 
-                                                          4, 
-                                                          5, 
-                                                          6, 
-                                                          7), 
-                                               labels = c("non-steroidal anti-inflammatory drugs", 
-                                                          "proton pump inhibitors", 
-                                                          "hypericum", 
-                                                          "red yeast rice", 
-                                                          "multi vitamins / dietary supplement", 
-                                                          "other", 
-                                                          "none"))
-table(data$medication_without_prescription, exclude = NULL)
-data$medication_without_prescription.NSAIDs_1 <- ifelse(is.na(medication_without_prescription.list), 
+names(data)[names(data) == "B2b"] <- "medication_wo_prescription"
+medication_wo_prescription.list <- strsplit(data$medication_wo_prescription, ",")
+data$medication_wo_prescription.NSAIDs_1 <- ifelse(is.na(medication_wo_prescription.list), 
                                                         NA, 
-                                                        ifelse(lapply(medication_without_prescription.list, function(x) { "1" %in% x}), 
+                                                        ifelse(lapply(medication_wo_prescription.list, function(x) { "1" %in% x}), 
                                                                1, 
                                                                0))
-data$medication_without_prescription.proton_pump_inhibitors_1 <- ifelse(is.na(medication_without_prescription.list), 
+data$medication_wo_prescription.proton_pump_inhibitors_1 <- ifelse(is.na(medication_wo_prescription.list), 
                                                                         NA, 
-                                                                        ifelse(lapply(medication_without_prescription.list, function(x) { "2" %in% x}), 
+                                                                        ifelse(lapply(medication_wo_prescription.list, function(x) { "2" %in% x}), 
                                                                                1, 
                                                                                0))
-data$medication_without_prescription.hypericum_1 <- ifelse(is.na(medication_without_prescription.list), 
+data$medication_wo_prescription.hypericum_1 <- ifelse(is.na(medication_wo_prescription.list), 
                                                            NA, 
-                                                           ifelse(lapply(medication_without_prescription.list, function(x) { "3" %in% x}), 
+                                                           ifelse(lapply(medication_wo_prescription.list, function(x) { "3" %in% x}), 
                                                                   1, 
                                                                   0))
-data$medication_without_prescription.red_yeast_rice_1 <- ifelse(is.na(medication_without_prescription.list), 
+data$medication_wo_prescription.red_yeast_rice_1 <- ifelse(is.na(medication_wo_prescription.list), 
                                                                 NA, 
-                                                                ifelse(lapply(medication_without_prescription.list, function(x) { "4" %in% x}), 
+                                                                ifelse(lapply(medication_wo_prescription.list, function(x) { "4" %in% x}), 
                                                                        1, 
                                                                        0))
-data$medication_without_prescription.multi_vitamins_dietary_supplement_1 <- ifelse(is.na(medication_without_prescription.list), 
+data$medication_wo_prescription.multi_vitamins_dietary_supplement_1 <- ifelse(is.na(medication_wo_prescription.list), 
                                                                                    NA, 
-                                                                                   ifelse(lapply(medication_without_prescription.list, function(x) { "5" %in% x}), 
+                                                                                   ifelse(lapply(medication_wo_prescription.list, function(x) { "5" %in% x}), 
                                                                                           1, 
                                                                                           0))
-data$medication_without_prescription.other_1 <- ifelse(is.na(medication_without_prescription.list), 
+data$medication_wo_prescription.other_1 <- ifelse(is.na(medication_wo_prescription.list), 
                                                        NA, 
-                                                       ifelse(lapply(medication_without_prescription.list, function(x) { "6" %in% x}), 
+                                                       ifelse(lapply(medication_wo_prescription.list, function(x) { "6" %in% x}), 
                                                               1, 
                                                               0))
-data$medication_without_prescription.none_1 <- ifelse(is.na(medication_without_prescription.list), 
+data$medication_wo_prescription.none_1 <- ifelse(is.na(medication_wo_prescription.list), 
                                                       NA, 
-                                                      ifelse(lapply(medication_without_prescription.list, function(x) { "7" %in% x}), 
+                                                      ifelse(lapply(medication_wo_prescription.list, function(x) { "7" %in% x}), 
                                                              1, 
                                                              0))
 
-table(data$medication_without_prescription.NSAIDs_1, data$high_risk_medications.NSAIDs.yes_1, exclude = NULL)
-data$NSAIDs_composite.yes_1 <- ifelse((data$medication_without_prescription.NSAIDs_1 == 1) |
+table(data$medication_wo_prescription.NSAIDs_1, data$high_risk_medications.NSAIDs.yes_1, exclude = NULL)
+data$NSAIDs_composite.yes_1 <- ifelse((data$medication_wo_prescription.NSAIDs_1 == 1) |
                                         (data$high_risk_medications.NSAIDs.yes_1 == 1),
                                       1, 
                                       0)
@@ -1060,11 +1043,11 @@ data$information_gained.no_1 <- ifelse(data$information_gained == "no",
                                        1, 
                                        data$information_gained.no_1)
 
-################################################################################################################################
+########################################################################################################################
 
 # Definition of an event
 
-################################################################################################################################
+########################################################################################################################
 
 table(data$medications_interaction, data$warnings, exclude = NULL) 
 table(data$medications_interaction, data$warnings, data$medications_revision.physician, exclude = NULL)
@@ -1076,7 +1059,7 @@ data$y.interaction <- ifelse(data$medications_interaction.yes_1 == 1,
                              0) 
 data$y.interaction <- ifelse(is.na(data$y.interaction),
                              0,
-                             data$y.interaction) # Assumption NA equals to no medications interaction.
+                             data$y.interaction) # Assumption NA equals to no medications interaction (warnings NA).
 table(data$y.interaction, exclude = NULL)
 
 data$y.revision_wo_interaction <- ifelse((data$y.interaction == 0) 
@@ -1095,11 +1078,11 @@ data$y <- ifelse(is.na(data$y),
                  data$y) # Assumption NA equals to no event. 
 table(data$y, exclude = NULL)
 
-################################################################################################################################
+########################################################################################################################
 
 # Final data frame
 
-################################################################################################################################
+########################################################################################################################
 
 data <- subset(data, select = -c(SPEC,
                                  A13a,
