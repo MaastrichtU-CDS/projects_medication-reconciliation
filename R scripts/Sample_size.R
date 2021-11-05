@@ -10,7 +10,7 @@
 
 ########################################################################################################################
 
-source(".\\Preprocessing.R")
+source("./Preprocessing.R")
 rm(list = setdiff(ls(), "data"))
 
 ########################################################################################################################
@@ -449,7 +449,6 @@ ggplot(n.B4.y.interaction, aes(x = p_cand, y = n, colour = as.factor(Rsqn))) +
   ggtitle("Medications interaction") +
   theme_minimal() +
   theme(panel.grid.minor = element_line(colour = "white"))
-
 
 # y.revision_wo_interaction
 
