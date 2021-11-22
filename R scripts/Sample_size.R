@@ -15,7 +15,7 @@ rm(list = setdiff(ls(), "data"))
 
 ########################################################################################################################
 
-# Criterion B1: Intercept with a margin of error of 0.05 # Multiple end-points correction?
+# Criterion B1: Intercept with a margin of error of 0.05
 
 ########################################################################################################################
 
