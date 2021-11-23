@@ -1,0 +1,10 @@
+
+data/QZExport99-Pivot.xlsx
+data/med_recon.csv
+data/med_recon_dummies.csv
+notebooks/Keras_example_strcutured_data_from_scratch.ipynb
+notebooks/.ipynb_checkpoints/Keras_example_strcutured_data_from_scratch-checkpoint.ipynb
+R scripts/.Rhistory
+R scripts/.RData
+notebooks/.ipynb_checkpoints/data_exploration-checkpoint.ipynb
+notebooks/.ipynb_checkpoints/Medication reconciliation-checkpoint.ipynb
