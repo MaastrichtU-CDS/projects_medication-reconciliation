@@ -802,10 +802,11 @@ data$medication_prescribed_during_consult.yes_no <- factor(data$medication_presc
                                                            labels = c("yes", 
                                                                       "no"))
 table(data$medication_prescribed_during_consult.yes_no, exclude = NULL) # View(t(subset(data, is.na(data$medication_prescribed_during_consult.yes_no)))) # New medication was prescribed (see variable below), missing value equals yes.
+# imputing 'yes' for the single case of missing data because there is a prescribed medication name
 data$medication_prescribed_during_consult.yes_no <- ifelse(is.na(data$medication_prescribed_during_consult.yes_no),
-                                                           "yes",
+                                                           1,
                                                            data$medication_prescribed_during_consult.yes_no)
-data$medication_prescribed_during_consult.yes_1 <- ifelse(data$medication_prescribed_during_consult.yes_no == "yes", 
+data$medication_prescribed_during_consult.yes_1 <- ifelse(data$medication_prescribed_during_consult.yes_no == 1, 
                                                           1, 
                                                           0)
 
