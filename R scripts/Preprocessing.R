@@ -1,39 +1,44 @@
-
-########################################################################################################################
-
-# Packages
-
-########################################################################################################################
+# PACKAGES ----
 
 library(readxl)
 library(ggplot2)
 
-########################################################################################################################
+# DATA ----
 
-# Data 
-
-########################################################################################################################
-
-data <- read_excel("./QZExport104-Anoniem.xlsx", skip = 4)
+data <- read_excel("C:/Users/P70070766/Documents/Medication reconciliation/Data/Kopie van QZImport107x-Anoniem.xlsx", skip = 4) 
 colnames(data)[1] <- "id"
 table(is.na(data$id))
-data <- subset(data, id != "AGFspkFhsI") # All variables are missing for the ID equal to "AGFspkFhsI". Data entry error? Excluded.
+data <- data[data$id != "AGFspkFhsI", ] # All missing values. Has been checked, most likely data entry error. 
+data <- data[data$id != "7EGpgbdhnP", ] # Many missing values. Has been checked, most likely data entry error. 
 dup_id <- data[(duplicated(data$id, fromLast = FALSE) == TRUE) | duplicated(data$id, fromLast = TRUE) == TRUE,]$id
-data <- subset(data, (id %in% dup_id) == FALSE) # Duplicate ids: same id for multiple patients, same id for same patient on multiple visits, or same id for same patient on one visit that included various out patient clinics? Excluded.
-data <- subset(data, id != "7EGpgbdhnP") # Many missing values. Data entry error? Excluded.
-table(is.na(data$id))
+#View(subset(data, (id %in% dup_id)))
+data <- data[!c( (data$id == "RWhAI8VyRg") & (data$SPEC == "NEU VASC") ), ] # Duplicated ID has been checked, correct entries of same patient. Removed second entry. (Note: entries are not according to time.)
+data <- data[!c( (data$id == "8wTTvGKcfs") & (data$SPEC == "REUM SPA") ), ] # REQUEST TO CHECK.
+data <- data[!c( (data$id == "+VwiZPm8lX") & (data$SPEC == "UROL ONCO") ), ] # REQUEST TO CHECK.
+data <- data[!c( (data$id == "a+/hkR+SLB") & (data$SPEC == "UROL FU") ), ] # REQUEST TO CHECK.
+data <- data[!c( (data$id == "A0pW4TS3pV") & (data$SPEC == "UROL FU") ), ] # REQUEST TO CHECK.
+data <- data[!c( (data$id == "2QFpSTWBcc") & (data$SPEC == "DERMA") ), ] # Duplicated ID has been checked, correct entries of same patient. Removed second entry. (Note: entries are not according to time.)
+data <- data[!c( (data$id == "HLkzz6SpkZ") & (data$SPEC == "UROL FU") ), ] # REQUEST TO CHECK.
+data <- data[!c( (data$id == "Iy68G3IisW") & (data$SPEC == "MDL NGM") ), ] # REQUEST TO CHECK.
+data <- data[!c( (data$id == "2oNzMJDTeO") & (data$SPEC == "UROL FU") ), ] # REQUEST TO CHECK.
+data <- data[!c( (data$id == "tqsHn6eVH+") & (data$SPEC == "NEURO") ), ] # Duplicated ID has been checked, correct entries of same patient. Removed second entry. (Note: entries are not according to time.)
+data <- data[!c( (data$id == "DUzC4IENg4") & (data$SPEC == "UROL FU") ), ] # Duplicated ID has been checked, correct entries of same patient. Removed second entry. (Note: entries are not according to time.)
+data <- data[!c( (data$id == "NJIvDpH2nF") & (data$SPEC == "CHI VAAT") ), ] # Duplicated ID has been checked, correct entries of same patient. Removed second entry. (Note: entries are not according to time.)
+data <- data[!c( (data$id == "apeIkxgLow") & (data$SPEC == "UROL FU") ), ] # REQUEST TO CHECK.
+data <- data[!c( (data$id == "8ColabP9nF") & (data$SPEC == "KNO-ALG") ), ] # REQUEST TO CHECK.
+data <- data[!c( (data$id == "azHk1mtt7Q") & (data$SPEC == "UROL ONCO") ), ] # REQUEST TO CHECK.
+data <- data[!c( (data$id == "icPvB/wJqm") & (data$SPEC == "INTERN ALG") ), ] # Duplicated ID has been checked, correct entries of same patient. Removed second entry. (Note: entries are not according to time.)
+data <- data[!c( (data$id == "icPvB/wJqm") & (data$SPEC == "UROL FU") ), ] # Duplicated ID has been checked, correct entries of same patient. Removed third entry. (Note: entries are not according to time.)
+data <- data[!c( (data$id == "DIj75C1KaE") & (data$SPEC == "ORTHO") ), ] # REQUEST TO CHECK.
+data <- data[!c( (data$id == "9WNYBZm5+T") & (data$SPEC == "INTERN-D") ), ] # Duplicated ID has been checked, correct entries of same patient. Removed second entry. (Note: entries are not according to time.)
 
-########################################################################################################################
+# CODING RESPONSES ----
 
-# Coding responses 
+## PART 1 ---- 
 
-########################################################################################################################
+### PART 1.A ----
 
-# Part 1 
-
-## Part 1.A
-
-### sex
+#### sex
 names(data)[names(data) == "A1a"] <- "sex"
 data$sex <- factor(data$sex, 
                    levels = c(1, 
@@ -45,26 +50,28 @@ data$sex.male_1 <- ifelse(data$sex == "male",
                           1, 
                           0)
 
-### age
+#### age
 names(data)[names(data) == "A2a"] <- "age"
 summary(data$age)
 ggplot(data, aes(x = age)) + 
   geom_histogram() + 
   theme_minimal()
 
-data$age.cat <- ifelse(data$age < 18, "< 18 years", data$age)
-data$age.cat <- ifelse((data$age >= 18) & (data$age < 30), "18 - 29 years", data$age.cat)
-data$age.cat <- ifelse((data$age >= 30) & (data$age < 40), "30 - 39 years", data$age.cat)
-data$age.cat <- ifelse((data$age >= 40) & (data$age < 50), "40 - 49 years", data$age.cat)
-data$age.cat <- ifelse((data$age >= 50) & (data$age < 60), "50 - 59 years", data$age.cat)
-data$age.cat <- ifelse((data$age >= 60) & (data$age < 70), "60 - 69 years", data$age.cat)
-data$age.cat <- ifelse((data$age >= 70) & (data$age < 80), "70 - 79 years", data$age.cat)
-data$age.cat <- ifelse((data$age >= 80) & (data$age < 90), "80 - 89 years", data$age.cat)
-data$age.cat <- ifelse((data$age >= 90) & (data$age < 100), "90 - 99 years", data$age.cat)
-data$age.cat <- ifelse(data$age >= 100, "100+ years", data$age.cat)
-table(data$age.cat, exclude = NULL)
-data$age.cat <- ordered(data$age.cat, levels = c("< 18 years",
-                                                 "18 - 29 years",
+data$age.cat_10 <- ifelse(data$age < 10, "0 - 9 years", data$age)
+data$age.cat_10 <- ifelse((data$age >= 10) & (data$age < 20), "10 - 19 years", data$age.cat_10)
+data$age.cat_10 <- ifelse((data$age >= 20) & (data$age < 30), "20 - 29 years", data$age.cat_10)
+data$age.cat_10 <- ifelse((data$age >= 30) & (data$age < 40), "30 - 39 years", data$age.cat_10)
+data$age.cat_10 <- ifelse((data$age >= 40) & (data$age < 50), "40 - 49 years", data$age.cat_10)
+data$age.cat_10 <- ifelse((data$age >= 50) & (data$age < 60), "50 - 59 years", data$age.cat_10)
+data$age.cat_10 <- ifelse((data$age >= 60) & (data$age < 70), "60 - 69 years", data$age.cat_10)
+data$age.cat_10 <- ifelse((data$age >= 70) & (data$age < 80), "70 - 79 years", data$age.cat_10)
+data$age.cat_10 <- ifelse((data$age >= 80) & (data$age < 90), "80 - 89 years", data$age.cat_10)
+data$age.cat_10 <- ifelse((data$age >= 90) & (data$age < 100), "90 - 99 years", data$age.cat_10)
+data$age.cat_10 <- ifelse(data$age >= 100, "100+ years", data$age.cat_10)
+table(data$age.cat_10, exclude = NULL)
+data$age.cat_10 <- ordered(data$age.cat_10, levels = c("0 - 9 years",
+                                                 "10 - 19 years",
+                                                 "20 - 29 years",
                                                  "30 - 39 years",
                                                  "40 - 49 years",
                                                  "50 - 59 years",
@@ -74,7 +81,9 @@ data$age.cat <- ordered(data$age.cat, levels = c("< 18 years",
                                                  "90 - 99 years",
                                                  "100+ years"))
 
-### diseases
+data$age.centered <- data$age - mean(data$age)
+
+#### diseases
 names(data)[names(data) == "A10a"] <- "diseases"
 diseases.list <- strsplit(data$diseases, ",")
 table(data$diseases, exclude = NULL) # '8. None of the above' was never selected. 
@@ -103,11 +112,13 @@ data$diseases.none_of_the_above_1 <- ifelse(lapply(diseases.list, function(x) { 
                                             1, 
                                             0) # Assumption NA equals to negative indication. 
 
-### number of diseases
+#### number of diseases
 names(data)[names(data) == "A9a"] <- "n_diseases"
 table(data$n_diseases, exclude = NULL)
 
-### eGFR
+#data$n_diseases.centered <- data$n_diseases - mean(data$n_diseases) # REQUEST TO CHECK CAUSE OF NA.
+
+#### eGFR
 names(data)[names(data) == "A12a"] <- "eGFR"
 data$eGFR <- ifelse(is.na(data$eGFR), 
                     6, 
@@ -145,32 +156,40 @@ data$eGFR.NA_1 <- ifelse(data$eGFR == "unknown or measured more than 12 months a
                          1, 
                          0)
 
-### number of visits all specialties outpatient clinics in past 12 months in MUMC+ 
-names(data)[names(data) == "A14a"] <- "n_visits_out_all_12m_MUMC"
-data$n_visits_out_all_12m_MUMC <- factor(data$n_visits_out_all_12m_MUMC, 
-                                         levels = c(1, 
-                                                    2, 
-                                                    3, 
-                                                    4), 
-                                         labels = c("0", 
-                                                    "1", 
-                                                    "2-5", 
-                                                    "> 5"))
-table(data$n_visits_out_all_12m_MUMC, exclude = NULL)
-data$n_visits_out_all_12m_MUMC.0_1 <- ifelse(data$n_visits_out_all_12m_MUMC == "0",
+data$eGFR.below_60_1 <- ifelse( (data$eGFR.30_59_1 == 1)
+                                |
+                                (data$eGFR.15_29_1 == 1)
+                                |
+                                (data$eGFR.below_15_1 == 1),
+                                1,
+                                0) # Assumption NA equals to negative indication. 
+
+#### number of visits all specialties outpatient clinics in past 12 months in MUMC+ 
+names(data)[names(data) == "A14a"] <- "n_visits_out_all_12m_MUMC.cat"
+data$n_visits_out_all_12m_MUMC.cat <- factor(data$n_visits_out_all_12m_MUMC.cat,
+                                             levels = c(1, 
+                                                        2, 
+                                                        3, 
+                                                        4), 
+                                             labels = c("0", 
+                                                        "1", 
+                                                        "2-5", 
+                                                        "> 5"))
+table(data$n_visits_out_all_12m_MUMC.cat, exclude = NULL)
+data$n_visits_out_all_12m_MUMC.0_1 <- ifelse(data$n_visits_out_all_12m_MUMC.cat == "0",
                                              1, 
                                              0)
-data$n_visits_out_all_12m_MUMC.1_1 <- ifelse(data$n_visits_out_all_12m_MUMC == "1", 
+data$n_visits_out_all_12m_MUMC.1_1 <- ifelse(data$n_visits_out_all_12m_MUMC.cat == "1", 
                                              1, 
                                              0)
-data$n_visits_out_all_12m_MUMC.2_to_5_1 <- ifelse(data$n_visits_out_all_12m_MUMC == "2-5",
+data$n_visits_out_all_12m_MUMC.2_to_5_1 <- ifelse(data$n_visits_out_all_12m_MUMC.cat == "2-5",
                                                   1, 
                                                   0)
-data$n_visits_out_all_12m_MUMC.above_5_1 <- ifelse(data$n_visits_out_all_12m_MUMC == "> 5",
+data$n_visits_out_all_12m_MUMC.above_5_1 <- ifelse(data$n_visits_out_all_12m_MUMC.cat == "> 5",
                                                    1, 
                                                    0)
 
-### visited specialty as outpatient and/or inpatient in past 12 months in MUMC+
+#### visited specialty as outpatient and/or inpatient in past 12 months in MUMC+
 inout_specialty_12m_MUMC.list <- strsplit(data$A150a, ",")
 data$inout_specialty_12m_MUMC.cardiology_1 <-ifelse(lapply(inout_specialty_12m_MUMC.list, function(x) { "1" %in% x }), 
                                                     1, 
@@ -249,7 +268,7 @@ data$inout_specialty_12m_MUMC.other_1 <- ifelse(lapply(inout_specialty_12m_MUMC.
                                                 0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_MUMC.other_1, exclude = NULL)
 
-### hospitalisation in past 12 months in MUMC+
+#### hospitalisation in past 12 months in MUMC+
 names(data)[names(data) == "A16a"] <- "in_all_12m_MUMC"
 data$in_all_12m_MUMC <- factor(data$in_all_12m_MUMC, 
                                levels = c(1, 
@@ -261,59 +280,88 @@ data$in_all_12m_MUMC.yes_1 <- ifelse(data$in_all_12m_MUMC == "yes",
                                      1, 
                                      0)
 
-### number of ER visits in past 12 months in MUMC+
+#### number of ER visits in past 12 months in MUMC+
 names(data)[names(data) == "A18a"] <- "n_ER_12m_MUMC"
 table(data$n_ER_12m_MUMC, exclude = NULL)
+
+data$n_ER_12m_MUMC.centered <- data$n_ER_12m_MUMC - mean(data$n_ER_12m_MUMC)
+
 data$ER_12m_MUMC.yes_1 <- ifelse(data$n_ER_12m_MUMC == 0, 
                                  0, 
                                  1)
 
-## Part 1.B
+### PART 1.B ----
 
-### number of medications
-names(data)[names(data) == "B1a"] <- "n_medications"
-table(data$n_medications, exclude = NULL)
+#### number of medications
+names(data)[names(data) == "B1a"] <- "n_prescribed_medications"
+table(data$n_prescribed_medications, exclude = NULL)
 
-### presence of following high-risk medications 
+data$n_prescribed_medications.centered <- data$n_prescribed_medications - mean(data$n_prescribed_medications)
+
+#### presence of following high-risk medications 
 high_risk_medications.list <- strsplit(data$B7a, ",")
 data$high_risk_medications.platelet_aggregation_inhibitors_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "1" %in% x }),
                                                                        1, 
                                                                        0) # Assumption NA equals to negative indication. 
+table(data$high_risk_medications.platelet_aggregation_inhibitors_1, exclude = NULL)
 data$high_risk_medications.anticoagulants_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "2" %in% x }),
                                                       1, 
                                                       0) # Assumption NA equals to negative indication.
+table(data$high_risk_medications.anticoagulants_1, exclude = NULL)
 data$high_risk_medications.NSAIDs_1 <-ifelse(lapply(high_risk_medications.list, function(x) { "3" %in% x }),
                                              1, 
                                              0) # Assumption NA equals to negative indication.
+table(data$high_risk_medications.NSAIDs_1, exclude = NULL)
 data$high_risk_medications.diuretics_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "4" %in% x }),
                                                  1, 
                                                  0) # Assumption NA equals to negative indication.
+table(data$high_risk_medications.diuretics_1, exclude = NULL)
 data$high_risk_medications.RAS_inhibitors_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "5" %in% x }),
                                                       1, 
                                                       0) # Assumption NA equals to negative indication.
+table(data$high_risk_medications.RAS_inhibitors_1, exclude = NULL)
 data$high_risk_medications.systemic_corticosteroids_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "6" %in% x }), 
                                                                 1, 
                                                                 0) # Assumption NA equals to negative indication.
+table(data$high_risk_medications.systemic_corticosteroids_1, exclude = NULL) # Low percentage of patients uses systemic corticosteroids.
 data$high_risk_medications.opioids_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "7" %in% x }),
                                                1, 
                                                0) # Assumption NA equals to negative indication.
+table(data$high_risk_medications.opioids_1, exclude = NULL)
 data$high_risk_medications.glucose_lowering_medications_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "8" %in% x }),
                                                                     1, 
                                                                     0) # Assumption NA equals to negative indication.
+table(data$high_risk_medications.glucose_lowering_medications_1, exclude = NULL)
 data$high_risk_medications.psychotropics_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "9" %in% x }),
                                                      1, 
                                                      0) # Assumption NA equals to negative indication.
+table(data$high_risk_medications.psychotropics_1, exclude = NULL)
 data$high_risk_medications.cardiac_medications_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "10" %in% x }),
                                                            1, 
                                                            0) # Assumption NA equals to negative indication.
+table(data$high_risk_medications.cardiac_medications_1, exclude = NULL)
 data$high_risk_medications.immunosuppressants_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "11" %in% x }),
                                                           1, 
                                                           0) # Assumption NA equals to negative indication.
+table(data$high_risk_medications.immunosuppressants_1, exclude = NULL) # Low percentage of patients uses immunosuppressants.
 data$high_risk_medications.oncolytics_1 <- ifelse(lapply(high_risk_medications.list, function(x) { "12" %in% x }),
                                                   1, 
                                                   0) # Assumption NA equals to negative indication.
-
-### high-risk medications
+table(data$high_risk_medications.oncolytics_1, exclude = NULL) # Low percentage of patients uses oncolytics.
+data$high_risk_medications.cardiovascular_composite_1 <- ifelse( (data$high_risk_medications.platelet_aggregation_inhibitors_1 == 1)
+                                                                 |
+                                                                 (data$high_risk_medications.anticoagulants_1 == 1)
+                                                                 |
+                                                                 (data$high_risk_medications.diuretics_1 == 1)
+                                                                 |
+                                                                 (data$high_risk_medications.RAS_inhibitors_1 == 1)
+                                                                 |
+                                                                 (data$high_risk_medications.cardiac_medications_1 == 1),
+                                                                 1,
+                                                                 0 )
+table(data$high_risk_medications.cardiovascular_composite_1, exclude = NULL)
+                                                              
+#### high-risk medications
 names(data)[names(data) == "B6a"] <- "high_risk_medications"
 data$high_risk_medications <- factor(data$high_risk_medications, 
                                      levels = c(1, 
@@ -328,9 +376,9 @@ data$high_risk_medications.yes_1 <- ifelse(data$high_risk_medications == "yes",
                                            1, 
                                            data$high_risk_medications.yes_1)
 
-## Part 1 C
+### PART 1 C ----
 
-### current visit specialty 
+#### current visit specialty 
 data$out_specialty_current_MUMC <- data$SPEC
 data$out_specialty_current_MUMC <- factor(data$out_specialty_current_MUMC, 
                                           levels = c("CARDIO", 
@@ -343,8 +391,13 @@ data$out_specialty_current_MUMC <- factor(data$out_specialty_current_MUMC,
                                                      "INTERN-D", 
                                                      "INTERN ALG", 
                                                      "INTERN GER",
+                                                     "KNO-ALG",
+                                                     "MDL-IBD",
+                                                     "MDL NGM",
                                                      "NEU VASC",
                                                      "NEURO",
+                                                     "ORTHO",
+                                                     "REUM JICHT",
                                                      "REUM SPA",
                                                      "REUMA",
                                                      "UROL FU",
@@ -359,8 +412,13 @@ data$out_specialty_current_MUMC <- factor(data$out_specialty_current_MUMC,
                                                      "internal medicine: D", 
                                                      "internal medicine: general",
                                                      "internal medicine: geriatrics",
+                                                     "otorhinolaryngology",
+                                                     "gastroenterology: inflammatory bowel diseases",
+                                                     "gastroenterology: neuro",
                                                      "neurology: vascular",
                                                      "neurology",
+                                                     "orthopedics",
+                                                     "rheumatology: gout",
                                                      "rheumatology: SPA",
                                                      "rheumatology",
                                                      "urology: functional",
@@ -412,6 +470,20 @@ data$out_specialty_current_MUMC.internal_medicine_composite_1 <- ifelse((data$ou
                                                                         (data$out_specialty_current_MUMC.internal_medicine_geriatrics_1 == 1),
                                                                         1, 
                                                                         0)
+data$out_specialty_current_MUMC.otorhinolaryngology_1 <- ifelse(data$out_specialty_current_MUMC == "otorhinolaryngology",
+                                                                1,
+                                                                0)
+data$out_specialty_current_MUMC.gastroenterology_ibd_1 <- ifelse(data$out_specialty_current_MUMC == "gastroenterology: inflammatory bowel diseases",
+                                                                 1,
+                                                                 0)
+data$out_specialty_current_MUMC.gastroenterology_neuro_1 <- ifelse(data$out_specialty_current_MUMC == "gastroenterology: neuro",
+                                                                   1,
+                                                                   0)
+data$out_specialty_current_MUMC.gastroenterology_composite_1 <- ifelse((data$out_specialty_current_MUMC.gastroenterology_ibd_1 == 1)
+                                                                       |
+                                                                       (data$out_specialty_current_MUMC.gastroenterology_neuro_1 == 1),
+                                                                       1,
+                                                                       0)
 data$out_specialty_current_MUMC.neurology_vascular_1 <- ifelse(data$out_specialty_current_MUMC == "neurology: vascular",
                                                                1,
                                                                0)
@@ -423,13 +495,21 @@ data$out_specialty_current_MUMC.neurology_composite_1 <- ifelse((data$out_specia
                                                                 (data$out_specialty_current_MUMC.neurology_1 == 1),
                                                                 1, 
                                                                 0)
+data$out_specialty_current_MUMC.orthopedics_1 <- ifelse(data$out_specialty_current_MUMC == "orthopedics",
+                                                        1,
+                                                        0)
+data$out_specialty_current_MUMC.rheumatology_gout_1 <- ifelse(data$out_specialty_current_MUMC == "rheumatology: gout",
+                                                              1,
+                                                              0)
 data$out_specialty_current_MUMC.rheumatology_SPA_1 <- ifelse(data$out_specialty_current_MUMC == "rheumatology: SPA",
                                                              1,
                                                              0)
 data$out_specialty_current_MUMC.rheumatology_1 <- ifelse(data$out_specialty_current_MUMC == "rheumatology",
                                                         1,
                                                         0)
-data$out_specialty_current_MUMC.rheumatology_composite_1 <- ifelse((data$out_specialty_current_MUMC.rheumatology_SPA_1 == 1) 
+data$out_specialty_current_MUMC.rheumatology_composite_1 <- ifelse((data$out_specialty_current_MUMC.rheumatology_gout_1 == 1)
+                                                                   |
+                                                                   (data$out_specialty_current_MUMC.rheumatology_SPA_1 == 1) 
                                                                    | 
                                                                    (data$out_specialty_current_MUMC.rheumatology_1 == 1),
                                                                    1,
@@ -445,11 +525,351 @@ data$out_specialty_current_MUMC.urology_composite_1 <- ifelse((data$out_specialt
                                                                (data$out_specialty_current_MUMC.urology_oncology_1 == 1),
                                                                1,
                                                                0)
+data$out_specialty_current_MUMC.cardiovascular_composite_1 <- ifelse((data$out_specialty_current_MUMC.cardiology_1 == 1)
+                                                                     |
+                                                                     (data$out_specialty_current_MUMC.neurology_vascular_1 == 1)
+                                                                     |
+                                                                     (data$out_specialty_current_MUMC.internal_medicine_vascular_1 == 1)
+                                                                     |
+                                                                     (data$out_specialty_current_MUMC.surgery_cardiovascular_1 == 1),
+                                                                     1,
+                                                                     0)
 
-### number of visits out patient clinic current specialty in past 12 months in MUMC+ 
-names(data)[names(data) == "C3a"] <- "n_visits_out_current_specialty_12m_MUMC.cat"
-table(data$n_visits_out_current_specialty_12m_MUMC.cat, exclude = NULL)
-data$n_visits_out_current_specialty_12m_MUMC.cat <- factor(data$n_visits_out_current_specialty_12m_MUMC.cat,
+#### inout_specialty_current_12m_MUMC.multiple_1
+data$inout_specialty_current_12m_MUMC.multiple_1 <- ifelse((data$out_specialty_current_MUMC.cardiology_1 == 1) 
+                                 &
+                                 ((data$inout_specialty_12m_MUMC.urology_1 == 1) 
+                                 |
+                                 (data$inout_specialty_12m_MUMC.psychiatry_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.otorhinolaryngology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.ophthalmology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.internal_medicine_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.orthopedics_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.plastic_surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.neurology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.dermatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.gastroenterology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.pneumology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.rheumatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.anesthesiology_1 == 1)),
+                                 1, 
+                                 0)
+data$inout_specialty_current_12m_MUMC.multiple_1 <- ifelse((data$out_specialty_current_MUMC.surgery_composite_1 == 1) 
+                                 &
+                                 ((data$inout_specialty_12m_MUMC.cardiology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.urology_1 == 1) 
+                                 |
+                                 (data$inout_specialty_12m_MUMC.psychiatry_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.otorhinolaryngology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.ophthalmology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.internal_medicine_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.orthopedics_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.neurology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.dermatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.gastroenterology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.pneumology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.rheumatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.anesthesiology_1 == 1)),
+                                 1, 
+                                 data$inout_specialty_current_12m_MUMC.multiple_1)
+data$inout_specialty_current_12m_MUMC.multiple_1 <- ifelse((data$out_specialty_current_MUMC.dermatology_1 == 1) 
+                                 &
+                                 ((data$inout_specialty_12m_MUMC.cardiology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.urology_1 == 1) 
+                                 |
+                                 (data$inout_specialty_12m_MUMC.psychiatry_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.otorhinolaryngology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.ophthalmology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.internal_medicine_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.orthopedics_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.plastic_surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.neurology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.gastroenterology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.pneumology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.rheumatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.anesthesiology_1 == 1)),
+                                 1, 
+                                 data$inout_specialty_current_12m_MUMC.multiple_1)
+data$inout_specialty_current_12m_MUMC.multiple_1 <- ifelse((data$out_specialty_current_MUMC.internal_medicine_composite_1 == 1) 
+                                 &
+                                 ((data$inout_specialty_12m_MUMC.cardiology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.urology_1 == 1) 
+                                 |
+                                 (data$inout_specialty_12m_MUMC.psychiatry_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.otorhinolaryngology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.ophthalmology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.orthopedics_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.plastic_surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.neurology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.dermatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.gastroenterology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.pneumology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.rheumatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.anesthesiology_1 == 1)),
+                                 1, 
+                                 data$inout_specialty_current_12m_MUMC.multiple_1)
+data$inout_specialty_current_12m_MUMC.multiple_1 <- ifelse((data$out_specialty_current_MUMC.otorhinolaryngology_1 == 1) 
+                                 &
+                                 ((data$inout_specialty_12m_MUMC.cardiology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.urology_1 == 1) 
+                                 |
+                                 (data$inout_specialty_12m_MUMC.psychiatry_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.ophthalmology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.internal_medicine_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.orthopedics_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.plastic_surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.neurology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.dermatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.gastroenterology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.pneumology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.rheumatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.anesthesiology_1 == 1)),
+                                 1, 
+                                 data$inout_specialty_current_12m_MUMC.multiple_1)
+data$inout_specialty_current_12m_MUMC.multiple_1 <- ifelse((data$out_specialty_current_MUMC.gastroenterology_composite_1 == 1) 
+                                 &
+                                 ((data$inout_specialty_12m_MUMC.cardiology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.urology_1 == 1) 
+                                 |
+                                 (data$inout_specialty_12m_MUMC.psychiatry_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.otorhinolaryngology_1 == 1)
+                                 | 
+                                 (data$inout_specialty_12m_MUMC.ophthalmology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.internal_medicine_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.orthopedics_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.plastic_surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.neurology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.dermatology_1 == 1)
+                                 |                                 
+                                 (data$inout_specialty_12m_MUMC.pneumology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.rheumatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.anesthesiology_1 == 1)),
+                                 1, 
+                                 data$inout_specialty_current_12m_MUMC.multiple_1)
+data$inout_specialty_current_12m_MUMC.multiple_1 <- ifelse((data$out_specialty_current_MUMC.neurology_composite_1 == 1) 
+                                 &
+                                 ((data$inout_specialty_12m_MUMC.cardiology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.urology_1 == 1) 
+                                 |
+                                 (data$inout_specialty_12m_MUMC.psychiatry_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.otorhinolaryngology_1 == 1)
+                                 | 
+                                 (data$inout_specialty_12m_MUMC.ophthalmology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.internal_medicine_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.orthopedics_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.plastic_surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.dermatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.gastroenterology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.pneumology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.rheumatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.anesthesiology_1 == 1)),
+                                 1, 
+                                 data$inout_specialty_current_12m_MUMC.multiple_1)
+data$inout_specialty_current_12m_MUMC.multiple_1 <- ifelse((data$out_specialty_current_MUMC.orthopedics_1 == 1) 
+                                 &
+                                 ((data$inout_specialty_12m_MUMC.cardiology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.urology_1 == 1) 
+                                 |
+                                 (data$inout_specialty_12m_MUMC.psychiatry_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.otorhinolaryngology_1 == 1)
+                                 | 
+                                 (data$inout_specialty_12m_MUMC.ophthalmology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.internal_medicine_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.plastic_surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.neurology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.dermatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.gastroenterology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.pneumology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.rheumatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.anesthesiology_1 == 1)),
+                                 1, 
+                                 data$inout_specialty_current_12m_MUMC.multiple_1)
+data$inout_specialty_current_12m_MUMC.multiple_1 <- ifelse((data$out_specialty_current_MUMC.rheumatology_composite_1 == 1) 
+                                 &
+                                 ((data$inout_specialty_12m_MUMC.cardiology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.urology_1 == 1) 
+                                 |
+                                 (data$inout_specialty_12m_MUMC.psychiatry_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.otorhinolaryngology_1 == 1)
+                                 | 
+                                 (data$inout_specialty_12m_MUMC.ophthalmology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.internal_medicine_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.orthopedics_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.plastic_surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.neurology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.dermatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.gastroenterology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.pneumology_1 == 1)
+                                 |                                 
+                                 (data$inout_specialty_12m_MUMC.anesthesiology_1 == 1)),
+                                 1, 
+                                 data$inout_specialty_current_12m_MUMC.multiple_1)
+data$inout_specialty_current_12m_MUMC.multiple_1 <- ifelse((data$out_specialty_current_MUMC.urology_composite_1 == 1) 
+                                 &
+                                 ((data$inout_specialty_12m_MUMC.cardiology_1 == 1)
+                                 |                                 
+                                 (data$inout_specialty_12m_MUMC.psychiatry_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.otorhinolaryngology_1 == 1)
+                                 | 
+                                 (data$inout_specialty_12m_MUMC.ophthalmology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.internal_medicine_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.orthopedics_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.plastic_surgery_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.obstetrics_and_gynaecology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.neurology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.dermatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.gastroenterology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.pneumology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.rheumatology_1 == 1)
+                                 |
+                                 (data$inout_specialty_12m_MUMC.anesthesiology_1 == 1)),
+                                 1, 
+                                 data$inout_specialty_current_12m_MUMC.multiple_1)
+table(data$inout_specialty_current_12m_MUMC.multiple_1, exclude = NULL)
+
+### number of visits out patient clinic current specialty in past 12 or 36 months in MUMC+ 
+names(data)[names(data) == "C3a"] <- "n_visits_out_current_specialty_12m_36m_MUMC.cat"
+table(data$n_visits_out_current_specialty_12m_36m_MUMC.cat, exclude = NULL)
+data$n_visits_out_current_specialty_12m_36m_MUMC.cat <- factor(data$n_visits_out_current_specialty_12m_36m_MUMC.cat,
                                                        levels = c("1",
                                                                   "2",
                                                                   "3"),
@@ -457,11 +877,11 @@ data$n_visits_out_current_specialty_12m_MUMC.cat <- factor(data$n_visits_out_cur
                                                                   "2",
                                                                   "3+"))
 
-# Part 2
+## PART 2 ----
 
-## Part 2 A
+### PART 2.A ----
 
-### housing
+#### housing
 names(data)[names(data) == "A3b"] <- "housing"
 data$housing <- ordered(data$housing, 
                         levels = c(1, 
@@ -490,7 +910,7 @@ data$housing.institution_1 <- ifelse(data$housing == "institution",
                                      1, 
                                      data$housing.institution_1)
 
-### patient-reported medication use 
+#### patient-reported medication use 
 names(data)[names(data) == "A21b"] <- "patient_reported_medication_use"
 data$patient_reported_medication_use <- factor(data$patient_reported_medication_use, 
                                                levels = c(1, 
@@ -505,7 +925,7 @@ data$patient_reported_medication_use.yes_1 <- ifelse(data$patient_reported_medic
                                                      1, 
                                                      data$patient_reported_medication_use.yes_1)
 
-### pill box (week)
+#### pill box (week)
 names(data)[names(data) == "A4b"] <- "pill_box.week"
 data$pill_box.week <- factor(data$pill_box.week, 
                              levels = c(1, 
@@ -520,7 +940,7 @@ data$pill_box.week.yes_1 <- ifelse(data$pill_box.week == "yes",
                                    1, 
                                    0)
 
-### person responsible for medications
+#### person responsible for medications
 names(data)[names(data) == "A5b"] <- "person_responsible_for_medications"
 data$person_responsible_for_medications <- factor(data$person_responsible_for_medications, 
                                                   levels = c(1, 
@@ -532,7 +952,7 @@ data$person_responsible_for_medications <- factor(data$person_responsible_for_me
 table(data$person_responsible_for_medications, exclude = NULL)
 data$person_responsible_for_medications.patient_1 <- ifelse(is.na(data$person_responsible_for_medications), 
                                                             NA, 
-                                                            0)
+                                                            0) 
 data$person_responsible_for_medications.patient_1 <- ifelse(data$person_responsible_for_medications == "patient", 
                                                             1, 
                                                             data$person_responsible_for_medications.patient_1)
@@ -549,7 +969,7 @@ data$person_responsible_for_medications.health_professional_1 <- ifelse(data$per
                                                                         1, 
                                                                         data$person_responsible_for_medications.health_professional_1)
 
-### highest level of education attained
+#### highest level of education attained
 names(data)[names(data) == "A6b"] <- "education"
 data$education <- ordered(data$education, 
                           levels = c(1, 
@@ -586,7 +1006,7 @@ data$education.type_4_1 <- ifelse(data$education == "type 4",
                                   1, 
                                   0)
 
-### allergy medication
+#### allergy medication
 names(data)[names(data) == "A13b"] <- "allergy_medication"
 data$allergy_medication <- factor(data$allergy_medication, 
                                   levels = c(1, 
@@ -598,11 +1018,11 @@ data$allergy_medication.yes_1 <- ifelse(data$allergy_medication == "yes",
                                         1, 
                                         0) # Assumption NA equals to negative indication.
 
-### allergy medication symptoms
+#### allergy medication symptoms
 names(data)[names(data) == "A20b"] <- "allergy_medication_symptoms"
 allergy_medication_symptoms.not_NA.description <- subset(data, !is.na(allergy_medication_symptoms))$allergy_medication_symptoms
 
-### visit external hospital in past 12 months
+#### visit external hospital in past 12 months
 names(data)[names(data) == "A140b"] <- "visit_12m_external_hospital"
 data$visit_12m_external_hospital <- factor(data$visit_12m_external_hospital, 
                                         levels = c(1,
@@ -617,7 +1037,7 @@ data$visit_12m_external_hospital.yes_1 <- ifelse(data$visit_12m_external_hospita
                                               1, 
                                               0)
 
-### visited as outpatient and/or inpatient specialty in past 12 months in external hospital
+#### visited as outpatient and/or inpatient specialty in past 12 months in external hospital
 inout_specialty_12m_external_hospital.list <- strsplit(data$A150b, ",")
 data$inout_specialty_12m_external_hospital.cardiology_1 <- ifelse(lapply(inout_specialty_12m_external_hospital.list, function(x) { "1" %in% x }),
                                                                1, 
@@ -696,7 +1116,7 @@ data$inout_specialty_12m_external_hospital.other_1 <- ifelse(lapply(inout_specia
                                                           0) # Assumption NA equals to negative indication.
 table(data$inout_specialty_12m_external_hospital.other_1, exclude = NULL)
 
-### hospitalisation in past 12 months in external hospital
+#### hospitalisation in past 12 months in external hospital
 names(data)[names(data) == "A16b"] <- "in_all_12m_external_hospital"
 data$in_all_12m_external_hospital <- factor(data$in_all_12m_external_hospital, 
                                          levels = c(1, 
@@ -711,14 +1131,19 @@ data$in_all_12m_external_hospital.yes_1 <- ifelse(data$in_all_12m_external_hospi
                                                1, 
                                                data$in_all_12m_external_hospital.yes_1) 
 
-### number of ER visists in past 12 months in external hospital
+#### number of ER visists in past 12 months in external hospital
 names(data)[names(data) == "A18b"] <- "n_ER_12m_external_hospital"
 table(data$n_ER_12m_external_hospital, exclude = NULL)
+
+data$n_ER_12m_external_hospital.centered <- data$n_ER_12m_external_hospital - mean(data$n_ER_12m_external_hospital)
+
 data$ER_12m_external_hospital.yes_1 <- ifelse(data$n_ER_12m_external_hospital == 0, 
                                            0, 
                                            1)
 
-### medication without prescription
+### PART 2.B ----
+
+#### medication without prescription
 names(data)[names(data) == "B2b"] <- "medication_wo_prescription"
 medication_wo_prescription.list <- strsplit(data$medication_wo_prescription, ",")
 data$medication_wo_prescription.NSAIDs_1 <- ifelse(is.na(medication_wo_prescription.list), 
@@ -763,9 +1188,10 @@ data$NSAIDs_composite_1 <- ifelse((data$medication_wo_prescription.NSAIDs_1 == 1
                                   (data$high_risk_medications.NSAIDs_1 == 1),
                                   1, 
                                   0)
-# Part 3
 
-### medication literacy
+## PART 3 ----
+
+#### medication literacy
 names(data)[names(data) == "A7c"] <- "medication_literacy"
 data$medication_literacy <- factor(data$medication_literacy, 
                                    levels = c(1, 
@@ -775,46 +1201,38 @@ data$medication_literacy <- factor(data$medication_literacy,
                                               "suboptimal", 
                                               "insufficient"))
 table(data$medication_literacy, exclude = NULL)
-data$medication_literacy.adequate_1 <- ifelse(is.na(data$medication_literacy), 
-                                              NA, 
-                                              0)
-data$medication_literacy.adequate_1 <- ifelse(data$medication_literacy == "adequate", 
-                                              1, 
-                                              0)
-data$medication_literacy.suboptimal_1 <- ifelse(is.na(data$medication_literacy), 
-                                                NA, 
-                                                0)
+data$medication_literacy.adequate_1 <- ifelse( (data$medication_literacy == "adequate") 
+                                               |
+                                               is.na(data$medication_literacy), 
+                                               1, 
+                                               0) # Assumption NA equals to adequate.
 data$medication_literacy.suboptimal_1 <- ifelse(data$medication_literacy == "suboptimal", 
                                                 1, 
                                                 0)
-data$medication_literacy.insufficient_1 <- ifelse(is.na(data$medication_literacy), 
-                                                  NA, 
-                                                  0)
 data$medication_literacy.insufficient_1 <- ifelse(data$medication_literacy == "insufficient", 
                                                   1, 
                                                   0)
 
-### medication prescribed during consultation: yes/no
+#### medication prescribed during consultation: yes/no
 names(data)[names(data) == "B10c"] <- "medication_prescribed_during_consult.yes_no"
+table(data$medication_prescribed_during_consult.yes_no, exclude = NULL) # View(t(subset(data, is.na(data$medication_prescribed_during_consult.yes_no)))) # New medication was prescribed (see variable below), missing value equals yes.
+data$medication_prescribed_during_consult.yes_no <- ifelse(is.na(data$medication_prescribed_during_consult.yes_no),
+                                                           1,
+                                                           data$medication_prescribed_during_consult.yes_no)
 data$medication_prescribed_during_consult.yes_no <- factor(data$medication_prescribed_during_consult.yes_no, 
                                                            levels = c(1, 
                                                                       2), 
                                                            labels = c("yes", 
                                                                       "no"))
-table(data$medication_prescribed_during_consult.yes_no, exclude = NULL) # View(t(subset(data, is.na(data$medication_prescribed_during_consult.yes_no)))) # New medication was prescribed (see variable below), missing value equals yes.
-# imputing 'yes' for the single case of missing data because there is a prescribed medication name
-data$medication_prescribed_during_consult.yes_no <- ifelse(is.na(data$medication_prescribed_during_consult.yes_no),
-                                                           1,
-                                                           data$medication_prescribed_during_consult.yes_no)
-data$medication_prescribed_during_consult.yes_1 <- ifelse(data$medication_prescribed_during_consult.yes_no == 1, 
+data$medication_prescribed_during_consult.yes_1 <- ifelse(data$medication_prescribed_during_consult.yes_no == "yes", 
                                                           1, 
                                                           0)
 
-### medication prescribed during consultation: name
+#### medication prescribed during consultation: name
 names(data)[names(data) == "B11c"] <- "medication_prescribed_during_consult.name"
 medication_prescribed_during_consult.not_NA.name <- subset(data, !is.na(medication_prescribed_during_consult.name))$medication_prescribed_during_consult.name
 
-### medication prescribed during consultation: new
+#### medication prescribed during consultation: new
 names(data)[names(data) == "B12c"] <- "medication_prescribed_during_consult.new"
 data$medication_prescribed_during_consult.new <- factor(data$medication_prescribed_during_consult.new, 
                                                         levels = c(1, 
@@ -826,14 +1244,14 @@ data$medication_prescribed_during_consult.new_1 <- ifelse(data$medication_prescr
                                                           1, 
                                                           0)
 
-### medication stopped during consult: yes/no
+#### medication stopped during consult: yes/no
 names(data)[names(data) == "B20c"] <- "medication_stopped_during_consult.yes_no"
+table(data$medication_stopped_during_consult.yes_no, exclude = NULL)
 data$medication_stopped_during_consult.yes_no <- factor(data$medication_stopped_during_consult.yes_no, 
                                                         levels = c(1, 
                                                                    2), 
                                                         labels = c("yes", 
                                                                    "no"))
-table(data$medication_stopped_during_consult.yes_no, exclude = NULL)
 data$medication_stopped_during_consult.yes_1 <- ifelse(is.na(data$medication_stopped_during_consult.yes_no), 
                                                        NA, 
                                                        0)
@@ -841,11 +1259,11 @@ data$medication_stopped_during_consult.yes_1 <- ifelse(data$medication_stopped_d
                                                        1, 
                                                        data$medication_stopped_during_consult.yes_1)
 
-### medication stopped during consult: name
+#### medication stopped during consult: name
 names(data)[names(data) == "B21c"] <- "medication_stopped_during_consult.name"
 medication_stopped_during_consult.not_NA.name <- subset(data, !is.na(medication_stopped_during_consult.name))$medication_stopped_during_consult.name
 
-### non-medication intervention during consult 
+#### non-medication intervention during consult 
 names(data)[names(data) == "B13c"] <- "non_medication_intervention_during_consult"
 data$non_medication_intervention_during_consult <- factor(data$non_medication_intervention_during_consult, 
                                                           levels = c(1, 
@@ -860,7 +1278,7 @@ data$non_medication_intervention_during_consult.yes_1 <- ifelse(data$non_medicat
                                                                 1, 
                                                                 data$non_medication_intervention_during_consult.yes_1)
 
-### warnings
+#### warnings
 names(data)[names(data) == "S1c"] <- "warnings"
 data$warnings <- factor(data$warnings, 
                         levels = c(1, 
@@ -875,7 +1293,7 @@ data$warnings.yes_1 <- ifelse(data$warnings == "yes",
                               1, 
                               data$warnings.yes_1)
 
-### medications interaction
+#### medications interaction
 names(data)[names(data) == "S2c"] <- "medications_interaction"
 data$medications_interaction <- factor(data$medications_interaction, 
                                        levels = c(1, 
@@ -890,7 +1308,7 @@ data$medications_interaction.yes_1 <- ifelse(data$medications_interaction == "ye
                                              1, 
                                              data$medications_interaction.yes_1)
 
-### medications interaction G-standaard number
+#### medications interaction G-standaard number
 id.interaction_number <- as.data.frame(cbind(data$id, 
                                              data$S31c, 
                                              data$S32c, 
@@ -900,10 +1318,10 @@ colnames(id.interaction_number) <- c( "id",
                                       "interaction_number.2",
                                       "interaction_number.3")
 
-### medications interaction WFG
-# View(cbind(data$S41c, data$S42c, data$S43c))
+#### medications interaction WFG
+## View(cbind(data$S41c, data$S42c, data$S43c))
 
-### medications revision: pharmacy assistant 
+#### medications revision: pharmacy assistant 
 id.medication_revision.pharmacy_assistant <- as.data.frame(cbind(data$id, 
                                                                  data$S51c, 
                                                                  data$S52c, 
@@ -921,7 +1339,7 @@ data$medication_revision.pharmacy_assistant.yes_1 <- ifelse((id.medication_revis
                                                             0)
 table(data$medication_revision.pharmacy_assistant.yes_1, exclude = NULL)                                                            
 
-### medications revision: physician
+#### medications revision: physician
 names(data)[names(data) == "S6c"] <- "medications_revision.physician"
 data$medications_revision.physician <- factor(data$medications_revision.physician, 
                                               levels = c(1, 
@@ -938,7 +1356,7 @@ data$medications_revision.physician.yes_1 <- ifelse(data$medications_revision.ph
                                                     1, 
                                                     data$medications_revision.physician.yes_1)
 
-### prevented consequences
+#### prevented consequences
 names(data)[names(data) == "C5c"] <- "prevented_consequences"
 data$prevented_consequences <- factor(data$prevented_consequences, 
                                       levels = c(1, 
@@ -1015,7 +1433,7 @@ data$prevented_consequences.I_1 <- ifelse(data$prevented_consequences == "I",
                                           1, 
                                           data$prevented_consequences.I_1)
 
-### information gained
+#### information gained
 names(data)[names(data) == "S8c"] <- "information_gained"
 data$information_gained <- factor(data$information_gained, 
                                   levels = c(1, 
@@ -1044,11 +1462,7 @@ data$information_gained.no_1 <- ifelse(data$information_gained == "no",
                                        1, 
                                        data$information_gained.no_1)
 
-########################################################################################################################
-
-# Definition of an event
-
-########################################################################################################################
+# DEFINITION OF AN EVENT ----
 
 table(data$medications_interaction, data$warnings, exclude = NULL) 
 table(data$medications_interaction, data$warnings, data$medications_revision.physician, exclude = NULL)
@@ -1079,11 +1493,7 @@ data$y <- ifelse(is.na(data$y),
                  data$y) # Assumption NA equals to no event. 
 table(data$y, exclude = NULL)
 
-########################################################################################################################
-
-# Final data frame
-
-########################################################################################################################
+# FINAL DATA FRAME ----
 
 data <- subset(data, select = -c(SPEC,
                                  A13a,
@@ -1140,3 +1550,5 @@ data <- subset(data, select = -c(SPEC,
                                  S56c,
                                  S9c,
                                  S10c))
+
+rm(list = setdiff(ls(), "data"))
