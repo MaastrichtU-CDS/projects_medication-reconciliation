@@ -406,7 +406,7 @@ data$out_specialty_current_MUMC <- factor(data$out_specialty_current_MUMC,
                                                      "surgery",
                                                      "surgery: hepato-pancreato-biliary", 
                                                      "surgery: trauma",
-                                                     "surgery: cardiovascular", 
+                                                     "surgery: vascular", 
                                                      "dermatology",
                                                      "internal medicine: vascular",
                                                      "internal medicine: D", 
@@ -436,7 +436,7 @@ data$out_specialty_current_MUMC.surgery_hpb_1 <- ifelse(data$out_specialty_curre
 data$out_specialty_current_MUMC.surgery_trauma_1 <- ifelse(data$out_specialty_current_MUMC == "surgery: trauma", 
                                                            1, 
                                                            0)
-data$out_specialty_current_MUMC.surgery_cardiovascular_1 <- ifelse(data$out_specialty_current_MUMC == "surgery: cardiovascular", 
+data$out_specialty_current_MUMC.surgery_vascular_1 <- ifelse(data$out_specialty_current_MUMC == "surgery: vascular", 
                                                                    1, 
                                                                    0)
 data$out_specialty_current_MUMC.surgery_composite_1 <- ifelse((data$out_specialty_current_MUMC.surgery_1 == 1) 
@@ -529,9 +529,7 @@ data$out_specialty_current_MUMC.cardiovascular_composite_1 <- ifelse((data$out_s
                                                                      |
                                                                      (data$out_specialty_current_MUMC.neurology_vascular_1 == 1)
                                                                      |
-                                                                     (data$out_specialty_current_MUMC.internal_medicine_vascular_1 == 1)
-                                                                     |
-                                                                     (data$out_specialty_current_MUMC.surgery_cardiovascular_1 == 1),
+                                                                     (data$out_specialty_current_MUMC.internal_medicine_vascular_1 == 1),
                                                                      1,
                                                                      0)
 
