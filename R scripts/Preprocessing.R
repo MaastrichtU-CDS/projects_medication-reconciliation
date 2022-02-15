@@ -445,7 +445,7 @@ data$out_specialty_current_MUMC.surgery_composite_1 <- ifelse((data$out_specialt
                                                               | 
                                                               (data$out_specialty_current_MUMC.surgery_trauma_1 == 1) 
                                                               | 
-                                                              (data$out_specialty_current_MUMC.surgery_cardiovascular_1 == 1), 
+                                                              (data$out_specialty_current_MUMC.surgery_vascular_1 == 1), 
                                                               1, 
                                                               0)
 data$out_specialty_current_MUMC.dermatology_1 <- ifelse(data$out_specialty_current_MUMC == "dermatology", 
